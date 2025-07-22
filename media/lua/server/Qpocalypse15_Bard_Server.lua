@@ -1,7 +1,7 @@
 -- Qpocalypse15 Bard System - Server Module
 -- Server-side implementation of the Bard system
 
-require "shared/Qpocalypse15_Bard"
+require "Qpocalypse15_Bard"
 
 Qpocalypse15_BardServer = {}
 

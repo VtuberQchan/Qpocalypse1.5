@@ -1,7 +1,7 @@
 -- Qpocalypse15 DeathFlag Zombie AI Hooks
 -- Zombie AI hooks and DeathFlag effect application
 
-require "server/Qpocalypse15_DeathFlag_Server"
+require "Qpocalypse15_DeathFlag_Server"
 
 -- Cache variables for performance optimization
 local lastUpdateTime = 0

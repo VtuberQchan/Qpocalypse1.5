@@ -1,6 +1,6 @@
 -- Qpocalypse15 Bard System - Client Module
 
-require "shared/Qpocalypse15_Bard"
+require "Qpocalypse15_Bard"
 
 Qpocalypse15_BardClient = {}
 
