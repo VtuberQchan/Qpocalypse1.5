@@ -42,24 +42,6 @@ local function onFillInventoryObjectContextMenu(player, context, items)
     end
 end
 
---[[
-    for i = 1, #items do
-        local item = items[i]
-        if item and instanceof(item, "InventoryItem") then
-            if item:getFullType() == "Qpocalypse15.BardGuitarAcoustic" then
-                -- 이미 연주 중인지 확인
-                local playerID = player:getOnlineID()
-                if not Qpocalypse15_BardClient.playerBardState[playerID] or 
-                   Qpocalypse15_BardClient.playerBardState[playerID].state ~= Qpocalypse15_Bard.BardState.PLAYING then
-                    context:addOption(getText("ContextMenu_Qpocalypse15_PlayBard"), player, Qpocalypse15_BardClient.startPlayingBard, item)
-                end
-                break
-            end
-        end
-    end
-end
-]]--
-
 -- Start playing bard
 function Qpocalypse15_BardClient.startPlayingBard()
     
