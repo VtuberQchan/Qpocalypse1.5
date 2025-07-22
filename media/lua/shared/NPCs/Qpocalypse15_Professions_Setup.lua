@@ -13,9 +13,6 @@ end
 --Remove all vanilla professions
 ProfessionFramework.RemoveDefaultProfessions = true
 
---Always use starting kits
-ProfessionFramework.AlwaysUseStartingKits = true
-
 ---------Combatant Professions---------
 --Vanguard
 ProfessionFramework.addProfession("Vanguard", {
@@ -28,9 +25,6 @@ ProfessionFramework.addProfession("Vanguard", {
         [Perks.Nimble] = 2,
         [Perks.Axe] = 2,
         [Perks.Blunt] = 2,
-    },
-    inventory = {
-        "Base.BaseballBatNails",
     },
     traits = {
         "VanguardSpecialisation",
@@ -54,9 +48,6 @@ ProfessionFramework.addProfession("Recon", {
         [Perks.SmallBlade] = 4,
         [Perks.LongBlade] = 1,
     },
-    inventory = {
-        "Base.HuntingKnife",
-    },
     traits = {
         "ReconSpecialisation",
     },
@@ -78,13 +69,6 @@ ProfessionFramework.addProfession("Gunslinger", {
         [Perks.Aiming] = 3,
         [Perks.Reloading] = 3,
     },
-    inventory = {
-        "Base.Pistol",
-        "Base.9mmClip",
-        "Base.9mmClip",
-        "Base.Bullets9mmBox",
-        "Base.Suppressor_Bottle",
-    },
     traits = {
         "GunslingerSpecialisation",
     },
@@ -103,9 +87,6 @@ ProfessionFramework.addProfession("Craftsman", {
         [Perks.Woodwork] = 2,
         [Perks.MetalWelding] = 1,
         [Perks.Tailoring] = 2,
-    },
-    inventory = {
-        "Base.Hammer",
     },
     traits = {
         "CraftsmanSpecialisation",
@@ -129,9 +110,6 @@ ProfessionFramework.addProfession("Engineer", {
         [Perks.Electricity] = 2,
         [Perks.MetalWelding] = 2,
         [Perks.Mechanics] = 2,
-    },
-    inventory = {
-        "Base.Wrench",
     },
     traits = {
         "EngineerSpecialisation",
@@ -176,9 +154,6 @@ ProfessionFramework.addProfession("Forager", {
         [Perks.PlantScavenging] = 2,
         [Perks.Trapping] = 2,
     },
-    inventory = {
-        "Base.Shovel",
-    },
     traits = {
         "Herbalist2",
         "ForagerSpecialisation",
@@ -208,11 +183,6 @@ ProfessionFramework.addProfession("Field Medic", {
         [Perks.SmallBlade] = 1,
         [Perks.Cooking] = 2,
         [Perks.Doctor] = 4,
-    },
-    inventory = {
-        "Base.MortarPestle",
-        "Qpocalypse15.EmergencySurgeryKit",
-        "Qpocalypse15.EmergencySurgeryKit",
     },
     traits = {
         "FieldMedicSpecialisation",
@@ -260,9 +230,6 @@ ProfessionFramework.addProfession("Runner", {
         [Perks.Sneak] = 1,
         [Perks.Driving] = 4,
         [Perks.Scavenging] = 4,
-    },
-    inventory = {
-        "Qpocalypse15.BagRunnerSatchel",
     },
     traits = {
         "Dextrous2",
