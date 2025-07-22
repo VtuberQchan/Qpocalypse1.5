@@ -37,6 +37,7 @@ function SpecialisationFunction(_player, _perk, _amount)
 	local amount = _amount
 	local newamount = 0
 	local skip = false
+	local skipxpadd = false
 	local modifier = 10
 	local perklvl = player:getPerkLevel(_perk)
 	local perkxpmod = 1;
@@ -136,7 +137,7 @@ end
 
 function FixSpecialisationFunction(player, perk)
 	if player:getXp():getXP(perk) < 0 then
-		player:getXp():setXPToLevel(Perks.perk, player:getPerkLevel(perk))
+		player:getXp():setXPToLevel(perk, player:getPerkLevel(perk))
 	end
 end
 

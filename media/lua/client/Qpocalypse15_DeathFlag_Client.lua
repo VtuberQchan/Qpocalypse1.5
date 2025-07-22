@@ -1,4 +1,4 @@
--- Qpocalypse15 Bard System - Client Module
+-- Qpocalypse15 DeathFlag - Client Module
 
 -- ***************************************************************************
 -- * DeathFlag Extended Functionality                                        *
