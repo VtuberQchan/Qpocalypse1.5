@@ -46,7 +46,7 @@ end
 function Qpocalypse15_BardClient.startPlayingBard()
     
     local player = getPlayer()
-    -- Save player unique ID (compatible with single and multi-player)
+    -- Save player unique ID (compatible with single and multiplayer)
     local playerID = player:getOnlineID()
     local guitar = player:getInventory():getFirstTypeRecurse("Qpocalypse15.BardGuitarAcoustic")
     
