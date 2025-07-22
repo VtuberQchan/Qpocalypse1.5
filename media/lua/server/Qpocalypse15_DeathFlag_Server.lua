@@ -22,7 +22,7 @@ function Qpocalypse15_DeathFlag.activateDeathFlag(player, args)
         y = y,
         z = z,
         startTime = getTimestamp(),
-        duration = 15000, -- 15 seconds (milliseconds)
+        duration = 60000, -- 60 seconds (milliseconds)
         range = 20 -- 20 blocks range
     }
     

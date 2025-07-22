@@ -55,7 +55,8 @@ function ISQPDeathFlagAction:start()
         })
     else
         -- Execute after loading server module in single player
-        local serverModule = require("server/Qpocalypse15_DeathFlag_Server")
+        local serverModule = require("Qpocalypse15_DeathFlag_Server")
+        local zombieAI = require("Qpocalypse15_DeathFlag_ZombieAI")
         if Qpocalypse15_DeathFlag and Qpocalypse15_DeathFlag.activateDeathFlag then
             Qpocalypse15_DeathFlag.activateDeathFlag(self.character, {
                 playerID = self.character:getOnlineID(),

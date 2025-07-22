@@ -4,6 +4,28 @@
 require "Qpocalypse15_DeathFlag_Server"
 
 -- Cache variables for performance optimization
+-- Safe instanceof wrapper for dedicated server environments where the global helper may be missing
+local function _instanceof(obj, className)
+    -- If the built-in helper exists, defer to it
+    if type(instanceof) == "function" then
+        return instanceof(obj, className)
+    end
+
+    -- Fallback: try to read the Java class name via getObjectName / getType
+    if obj == nil then return false end
+
+    -- Common getters provided by IsoObject derivatives
+    if type(obj) == "table" or type(obj) == "userdata" then
+        if type(obj.getObjectName) == "function" then
+            return obj:getObjectName() == className
+        elseif type(obj.getType) == "function" then
+            return obj:getType() == className
+        end
+    end
+    return false
+end
+
+-- Cache variables for performance optimization
 local lastUpdateTime = 0
 local UPDATE_INTERVAL = 500 -- Update every 0.5 seconds (500ms) - more responsive
 
@@ -67,12 +89,12 @@ local function updateZombiesForDeathFlag()
                                             -- Focus the zombie on the DeathFlag user
                                             local currentTarget = zombie:getTarget()
                                             if not currentTarget or 
-                                              (instanceof(currentTarget, "IsoPlayer") and currentTarget ~= flagPlayer) then
+                                              (_instanceof(currentTarget, "IsoPlayer") and currentTarget ~= flagPlayer) then
                                                 zombie:setTarget(flagPlayer)
                                                 zombie:setTargetSeenTime(2500) -- Force target for 2.5 seconds
                                                 
                                                 -- Additional setting to ensure the zombie is definitely targeting the DeathFlag user
-                                                if zombie:getModData then
+                                                if zombie.getModData then
                                                     local modData = zombie:getModData()
                                                     modData.deathFlagTarget = flagPlayer:getOnlineID()
                                                     modData.deathFlagTime = getTimestamp()
@@ -104,18 +126,32 @@ local function onZombieUpdate(zombie)
     if not hasActiveFlags then return end
     
     local currentTarget = zombie:getTarget()
-    if currentTarget and instanceof(currentTarget, "IsoPlayer") then
+
+    -- 1) If the zombie ALREADY has a target, make sure the target is allowed
+    if currentTarget and _instanceof(currentTarget, "IsoPlayer") then
+        if not _instanceof(currentTarget, "IsoPlayer") then return end
         -- Check if the current target is within the DeathFlag protection range
-        if not Qpocalypse15_DeathFlag.isPlayerVisibleToZombie(currentTarget, zombie) then
+        if not (Qpocalypse15_DeathFlag.isPlayerVisibleToZombie and Qpocalypse15_DeathFlag.isPlayerVisibleToZombie(currentTarget, zombie)) then
             -- Protected players are removed from the target and redirected to the DeathFlag user
-                             for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
-                 local flagPlayer = flagData.player
-                 if flagPlayer and isZombieInDeathFlagRange(zombie, flagPlayer, flagData.range) then
-                     zombie:setTarget(flagPlayer)
-                     zombie:setTargetSeenTime(3000) -- Force target for 3 seconds
-                     break
-                 end
-             end
+            for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
+                local flagPlayer = flagData.player
+                if flagPlayer and isZombieInDeathFlagRange and isZombieInDeathFlagRange(zombie, flagPlayer, flagData.range) then
+                    zombie:setTarget(flagPlayer)
+                    zombie:setTargetSeenTime(3000) -- Force target for 3 seconds
+                    break
+                end
+            end
+        end
+
+    -- 2) If the zombie currently has NO target, but is inside the DeathFlag range, make it target the DeathFlag user.
+    elseif currentTarget == nil then
+        for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
+            local flagPlayer = flagData.player
+            if flagPlayer and isZombieInDeathFlagRange and isZombieInDeathFlagRange(zombie, flagPlayer, flagData.range) then
+                zombie:setTarget(flagPlayer)
+                zombie:setTargetSeenTime(3000) -- Force target for 3 seconds
+                break
+            end
         end
     end
 end
@@ -127,7 +163,7 @@ local function onZombieHearNoise(zombie, noiseSource, volume, x, y)
     -- Check if DeathFlag is activated
          for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
          local flagPlayer = flagData.player
-         if flagPlayer and isZombieInDeathFlagRange(zombie, flagPlayer, flagData.range) then
+         if flagPlayer and isZombieInDeathFlagRange and isZombieInDeathFlagRange(zombie, flagPlayer, flagData.range) then
              -- Redirect all noise within the range to the DeathFlag user
              zombie:setTarget(flagPlayer)
              zombie:setTargetSeenTime(3000)

@@ -53,7 +53,7 @@ local function onServerCommand(module, command, args)
         
         if localPlayer and localPlayer:getOnlineID() == playerID then
             -- If you used DeathFlag
-            print("[DeathFlag] 사망 플래그가 활성화되었습니다!")
+            print("[DeathFlag] DeathFlag Raised")
         end
     elseif command == "DeathFlagDeactivated" then
         -- Client processing when DeathFlag effect ends
@@ -62,7 +62,8 @@ local function onServerCommand(module, command, args)
         
         if localPlayer and localPlayer:getOnlineID() == playerID then
             -- If your DeathFlag effect ends
-            print("[DeathFlag] 사망 플래그 효과가 종료되었습니다.")
+            print("[DeathFlag] DeathFlag Ended")
+            localPlayer:Say(getText("IGUI_PlayerText_DeathFlagEnd"))
         end
     end
 end
