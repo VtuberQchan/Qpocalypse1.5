@@ -1,22 +1,21 @@
 -- Qpocalypse15 Bard System - Client Module
--- 클라이언트 측 바드 시스템 구현
 
 require "shared/Qpocalypse15_Bard"
 
 Qpocalypse15_BardClient = {}
 
--- 클라이언트 측 바드 상태 관리
+-- Client-side bard state management
 Qpocalypse15_BardClient.playerBardState = {}
 Qpocalypse15_BardClient.activeBardPlayers = {}
 
--- 단순한 연주 상태 체크용 변수
+-- Simple playing state check variable
 Qpocalypse15_BardClient.isCurrentlyPlaying = false
 
--- 기타 파괴 및 장비 해제 헬퍼 함수
+-- Helper function for destroying guitar and unequipping
 function Qpocalypse15_BardClient.destroyGuitarItem(player, guitar)
     if not player or not guitar then return end
 
-    -- 손에 들고 있는 아이템이 해당 기타라면 장비 해제
+    -- Unequip if the item in hand is the guitar
     if player:getPrimaryHandItem() == guitar then
         player:setPrimaryHandItem(nil)
     end
@@ -24,18 +23,17 @@ function Qpocalypse15_BardClient.destroyGuitarItem(player, guitar)
         player:setSecondaryHandItem(nil)
     end
 
-    -- 인벤토리에서 제거
+    -- Remove from inventory
     player:getInventory():Remove(guitar)
 end
 
--- 바드 컨텍스트 메뉴 추가
+-- Add bard context menu
 local function onFillInventoryObjectContextMenu(player, context, items)
     if not player or not items then return end
     local items = ISInventoryPane.getActualItems(items)
     
     for _, item in ipairs(items) do
         if item:getFullType() == "Qpocalypse15.BardGuitarAcoustic" then
-            -- 단순한 boolean 체크
             if not Qpocalypse15_BardClient.isCurrentlyPlaying then
                 context:addOption(getText("ContextMenu_Qpocalypse15_PlayBard"), player, Qpocalypse15_BardClient.startPlayingBard)
             end
@@ -62,39 +60,39 @@ end
 end
 ]]--
 
--- 바드 연주 시작
+-- Start playing bard
 function Qpocalypse15_BardClient.startPlayingBard()
     
     local player = getPlayer()
-    -- 플레이어 고유 ID 저장 (싱글 및 멀티플레이 모두 호환)
+    -- Save player unique ID (compatible with single and multi-player)
     local playerID = player:getOnlineID()
     local guitar = player:getInventory():getFirstTypeRecurse("Qpocalypse15.BardGuitarAcoustic")
     
-    -- 기타를 장비(양손 무기이므로 Secondary까지 설정해야 양손에 장착됨)
+    -- Equip guitar (since it's a two-handed weapon, we need to set Secondary as well)
     
     player:setPrimaryHandItem(guitar)
     player:setSecondaryHandItem(guitar)
     
-    -- 장비 설정이 성공했는지 확인
+    -- Check if equipment is successful
     if not Qpocalypse15_Bard.isPlayerEquippedWithBardGuitar(player) then
         print("Qpocalypse15 Bard: Failed to equip guitar, aborting")
         return
     end
     
-    -- 랜덤 음악 선택 및 3D 클립 준비
+    -- Select random music and prepare 3D clip
     local musicFile  = Qpocalypse15_Bard.getRandomMusicFile()
     local gameSound  = GameSounds and GameSounds.getSound(musicFile) or nil
     local clip       = gameSound and gameSound:getRandomClip() or nil
-    -- 3D 이미터 생성 (플레이어 위치)
+    -- Create 3D emitter (player position)
     local emitter    = getWorld():getFreeEmitter(player:getX(), player:getY(), player:getZ())
     local soundID    = nil
     if emitter and clip then
-        soundID = emitter:playClip(clip, nil) -- 3D 재생 (기본값 true)
+        soundID = emitter:playClip(clip, nil) -- 3D play (default true)
     else
         print("Qpocalypse15 Bard: failed to obtain emitter or clip")
     end
     
-    -- 서버에 연주 시작 알림 (안전한 전송)
+    -- Notify server of playing start (safe transmission)
     if sendClientCommand then
         sendClientCommand(player, "Qpocalypse15_Bard", "StartPlaying", {
             playerID = playerID,
@@ -105,7 +103,7 @@ function Qpocalypse15_BardClient.startPlayingBard()
         })
     end
     
-    -- 클라이언트 상태 업데이트 (사운드는 서버 응답에서 처리)
+    -- Update client state (sound handled by server response)
     Qpocalypse15_BardClient.playerBardState[playerID] = {
         state     = Qpocalypse15_Bard.BardState.PLAYING,
         musicFile = musicFile,
@@ -115,11 +113,11 @@ function Qpocalypse15_BardClient.startPlayingBard()
         startTime = getTimestamp()
     }
     
-    -- 연주 상태 플래그 설정
+    -- Set playing state flag
     Qpocalypse15_BardClient.isCurrentlyPlaying = true
 end
 
--- 바드 연주 중지 (수동 중지용 - 현재 미사용, UI 확장 시 활용 가능)
+-- Stop playing bard (manual stop - currently unused, can be used when UI is expanded)
 function Qpocalypse15_BardClient.stopPlayingBard(player, destroyGuitar)
     if not player then return end
     
@@ -127,7 +125,7 @@ function Qpocalypse15_BardClient.stopPlayingBard(player, destroyGuitar)
     local bardState = Qpocalypse15_BardClient.playerBardState[playerID]
     
     if bardState and bardState.state == Qpocalypse15_Bard.BardState.PLAYING then
-        -- 서버에 연주 중지 알림 (안전한 전송)
+        -- Notify server of stop playing (safe transmission)
         if sendClientCommand then
             sendClientCommand(player, "Qpocalypse15_Bard", "StopPlaying", {
                 playerID = playerID,
@@ -135,7 +133,7 @@ function Qpocalypse15_BardClient.stopPlayingBard(player, destroyGuitar)
             })
         end
         
-        -- 사운드 중지 (자신의 사운드만)
+        -- Stop sound (only own sound)
         if bardState.emitter and bardState.soundID then
             if bardState.emitter.stopSound then
                 bardState.emitter:stopSound(bardState.soundID)
@@ -144,13 +142,13 @@ function Qpocalypse15_BardClient.stopPlayingBard(player, destroyGuitar)
             end
         end
         
-        -- 기타 파괴 (클라이언트에서만 가능)
+        -- Destroy guitar (only possible on client)
         if destroyGuitar and bardState.guitar then
             Qpocalypse15_BardClient.destroyGuitarItem(player, bardState.guitar)
             print("Qpocalypse15 Bard: Guitar destroyed for local player")
         end
         
-        -- 상태 초기화
+        -- Initialize state
         Qpocalypse15_BardClient.playerBardState[playerID] = {
             state = Qpocalypse15_Bard.BardState.IDLE,
             musicFile = nil,
@@ -159,15 +157,15 @@ function Qpocalypse15_BardClient.stopPlayingBard(player, destroyGuitar)
             soundID = nil
         }
         
-        -- 연주 상태 플래그 해제
+        -- Reset playing state flag
         Qpocalypse15_BardClient.isCurrentlyPlaying = false
     end
 end
 
--- 성능 최적화를 위한 카운터
+-- Counter for performance optimization
 Qpocalypse15_BardClient.updateCounter = 0
 
--- 장비 변경 감지 및 바드 효과 적용
+-- Detect equipment change and apply bard effects
 local function onPlayerUpdate(player)
     if not player then return end
     
@@ -175,15 +173,15 @@ local function onPlayerUpdate(player)
     local bardState = Qpocalypse15_BardClient.playerBardState[playerID]
     
     if bardState and bardState.state == Qpocalypse15_Bard.BardState.PLAYING then
-        -- 3D 사운드 위치 및 틱 업데이트
+        -- Update 3D sound position and tick
         if bardState.emitter then
             bardState.emitter:setPos(player:getX(), player:getY(), player:getZ())
             bardState.emitter:tick()
         end
         
-        -- 바드 기타가 장비 해제되었는지 확인 (중요하므로 매번 체크)
+        -- Check if bard guitar is unequipped (important to check every time)
         if not Qpocalypse15_Bard.isPlayerEquippedWithBardGuitar(player) then
-            -- 장비 해제 시 즉시 처리 (중복 방지)
+            -- Immediately process when unequipped (avoid duplicates)
             if bardState.emitter and bardState.soundID then
                 if bardState.emitter.stopSound then
                     bardState.emitter:stopSound(bardState.soundID)
@@ -192,13 +190,13 @@ local function onPlayerUpdate(player)
                 end
             end
             
-            -- 즉시 기타 파괴 (이미 장비 해제되었으므로 guitar 객체로 파괴)
+            -- Immediately destroy guitar (already unequipped, so destroy guitar object)
             if bardState.guitar then
                 Qpocalypse15_BardClient.destroyGuitarItem(player, bardState.guitar)
                 print("Qpocalypse15 Bard: Guitar unequipped and destroyed")
             end
             
-            -- 상태 초기화
+            -- Initialize state
             Qpocalypse15_BardClient.playerBardState[playerID] = {
                 state = Qpocalypse15_Bard.BardState.IDLE,
                 musicFile = nil,
@@ -207,10 +205,10 @@ local function onPlayerUpdate(player)
                 soundID = nil
             }
             
-            -- 연주 상태 플래그 해제
+            -- Reset playing state flag
             Qpocalypse15_BardClient.isCurrentlyPlaying = false
             
-            -- 서버에 상태 업데이트만 알림 (기타는 이미 파괴됨)
+            -- Notify server of state update only (guitar is already destroyed)
             if sendClientCommand then
                 sendClientCommand(player, "Qpocalypse15_Bard", "StopPlaying", {
                     playerID = playerID,
@@ -219,13 +217,13 @@ local function onPlayerUpdate(player)
             end
         end
         
-        -- 자신의 사운드 상태 확인 (성능 최적화: 10번에 1번만)
+        -- Check own sound state (performance optimization: only 10 times per second)
         if Qpocalypse15_BardClient.updateCounter % 10 == 0 then
             Qpocalypse15_BardClient.checkMyBardSound(player)
         end
     end
     
-    -- 성능 최적화: 10번에 1번만 실행 (약 1초마다)
+    -- Performance optimization: only 10 times per second (approximately 1 second)
     Qpocalypse15_BardClient.updateCounter = Qpocalypse15_BardClient.updateCounter + 1
     if Qpocalypse15_BardClient.updateCounter % 10 == 0 then
         Qpocalypse15_BardClient.applyBardEffectsToLocalPlayer(player)
@@ -233,7 +231,7 @@ local function onPlayerUpdate(player)
     end
 end
 
--- 로컬 플레이어에게 바드 효과 적용
+-- Apply bard effects to local player
 function Qpocalypse15_BardClient.applyBardEffectsToLocalPlayer(player)
     if not player or not player:isAlive() then return end
     
@@ -241,7 +239,7 @@ function Qpocalypse15_BardClient.applyBardEffectsToLocalPlayer(player)
     local playerY = player:getY()
     local playerZ = player:getZ()
     
-    -- 활성 바드 플레이어들 중 범위 내에 있는지 확인
+    -- Check if in range of active bard players
     local inBardRange = false
     for bardPlayerID, bardData in pairs(Qpocalypse15_BardClient.activeBardPlayers) do
         if bardData and bardData.x and bardData.y and bardData.z == playerZ then
@@ -253,53 +251,53 @@ function Qpocalypse15_BardClient.applyBardEffectsToLocalPlayer(player)
         end
     end
     
-    -- 자신이 바드를 연주하고 있는 경우도 확인
+    -- Check if you are playing bard
     local playerID = player:getOnlineID()
     local myBardState = Qpocalypse15_BardClient.playerBardState[playerID]
     if myBardState and myBardState.state == Qpocalypse15_Bard.BardState.PLAYING then
         inBardRange = true
     end
     
-    -- 바드 범위 내에 있으면 진정 효과 적용
+    -- Apply calm effect if in bard range
     if inBardRange then
         local stats = player:getStats()
         local bodyDamage = player:getBodyDamage()
         
-        -- 패닉 및 스트레스 완화 (한 번에 10포인트씩 감소, 최소 0)
+        -- Reduce panic and stress (10 points at a time, minimum 0)
         local newPanic   = math.max(0, stats:getPanic()   - 10)
         local newStress  = math.max(0, stats:getStress()  - 10)
         stats:setPanic(newPanic)
         stats:setStress(newStress)
         
-        -- 불행도 감소 (균형잡힌 조정)
+        -- Decrease unhappiness (balanced adjustment)
         local currentUnhappiness = bodyDamage:getUnhappynessLevel()
         if currentUnhappiness > 0 then
-            local newUnhappiness = math.max(0, currentUnhappiness - 5) -- 지속적으로 적용되므로 5로 조정
+            local newUnhappiness = math.max(0, currentUnhappiness - 5) -- Adjusted to 5 for continuous application
             bodyDamage:setUnhappynessLevel(newUnhappiness)
         end
     end
 end
 
--- 바드 플레이어 위치 업데이트 및 사운드 상태 확인
+-- Update bard player positions and check sound state
 function Qpocalypse15_BardClient.updateBardPlayerPositions()
-    -- 싱글플레이/멀티플레이 호환 플레이어 목록 가져오기
+    -- Get list of players (compatible with single and multi-player)
     local allPlayers = nil
     if isClient() and getOnlinePlayers then
         allPlayers = getOnlinePlayers()
     elseif IsoPlayer.getPlayers then
         allPlayers = IsoPlayer.getPlayers()
     else
-        -- 플레이어 목록을 가져올 수 없으면 반환
+        -- Return if player list cannot be obtained
         return
     end
     
-    -- 로컬 플레이어 한 번만 가져오기 (성능 최적화)
+    -- Get local player only once (performance optimization)
     local localPlayer = getPlayer() or (getSpecificPlayer and getSpecificPlayer(0))
     
     local playersToRemove = {}
     
     for playerID, bardData in pairs(Qpocalypse15_BardClient.activeBardPlayers) do
-        -- 해당 플레이어 찾기 (연결 해제 감지)
+        -- Find the corresponding player (disconnect detection)
         local bardPlayer = nil
         for i = 0, allPlayers:size() - 1 do
             local player = allPlayers:get(i)
@@ -310,26 +308,26 @@ function Qpocalypse15_BardClient.updateBardPlayerPositions()
         end
         
         if not bardPlayer then
-            -- 플레이어가 연결 해제되었으면 정리
+            -- Clean up if player disconnected
             table.insert(playersToRemove, playerID)
             print("Qpocalypse15 Bard: Player " .. playerID .. " disconnected, cleaning up")
         elseif bardData.emitter and bardData.soundID then
-            -- 사운드 재생 상태 확인
+            -- Check sound playing state
             local isStillPlaying = false
             if bardData.emitter.isPlaying then
                 isStillPlaying = bardData.emitter:isPlaying(bardData.soundID)
             end
             
             if not isStillPlaying then
-                -- 사운드가 끝났으면 로컬에서만 정리
+                -- Clean up only locally if sound ended
                 table.insert(playersToRemove, playerID)
                 print("Qpocalypse15 Bard: Music ended for player: " .. playerID .. " (local cleanup)")
             else
-                -- 플레이어가 살아있고 사운드가 재생 중이면 위치 업데이트
-                    -- 플레이어의 현재 위치로 emitter 위치 업데이트
+                -- Update position if player is alive and sound is playing
+                    -- Update emitter position to player's current position
                     local newX, newY, newZ = bardPlayer:getX(), bardPlayer:getY(), bardPlayer:getZ()
                     
-                    -- 거리 체크 (PLAY_RANGE를 벗어났는지 확인)
+                    -- Check distance (check if PLAY_RANGE is exceeded)
                     local isInRange = false
                     if localPlayer then
                         local distance = Qpocalypse15_Bard.getDistance(localPlayer:getX(), localPlayer:getY(), newX, newY)
@@ -338,7 +336,7 @@ function Qpocalypse15_BardClient.updateBardPlayerPositions()
                     end
                     
                     if not isInRange then
-                        -- 범위를 벗어났으면 사운드만 중지 (상태는 유지하여 재진입 시 재생 가능)
+                        -- Stop sound only if out of range (keep state to allow re-entry)
                         if bardData.emitter and bardData.soundID then
                             if bardData.emitter.stopSound then
                                 bardData.emitter:stopSound(bardData.soundID)
@@ -347,20 +345,20 @@ function Qpocalypse15_BardClient.updateBardPlayerPositions()
                             end
                             bardData.emitter = nil
                             bardData.soundID = nil
-                            bardData.resyncRequested = false  -- 재동기화 플래그 리셋
+                            bardData.resyncRequested = false  -- Reset resync flag
                         end
                         print("Qpocalypse15 Bard: Player " .. playerID .. " out of range, sound paused")
                     elseif not bardData.emitter and isInRange then
-                        -- 범위 안으로 다시 들어왔으면 서버에 재동기화 요청 (중복 방지)
+                        -- Request resync to server if back in range (avoid duplicates)
                         if not bardData.resyncRequested and localPlayer and sendClientCommand then
                             sendClientCommand(localPlayer, "Qpocalypse15_Bard", "RequestResync", {
                                 targetPlayerID = playerID
                             })
-                            bardData.resyncRequested = true -- 중복 요청 방지 플래그
+                            bardData.resyncRequested = true -- Avoid duplicate request flag
                             print("Qpocalypse15 Bard: Player " .. playerID .. " back in range, requesting resync")
                         end
                     elseif bardData.emitter and (math.abs(bardData.x - newX) > 0.1 or math.abs(bardData.y - newY) > 0.1 or bardData.z ~= newZ) then
-                        -- 위치가 변경되었으면 새로운 emitter로 교체
+                        -- Replace with new emitter if position changed
                         bardData.emitter:stopAll()
                         
                         local newEmitter = getWorld():getFreeEmitter(newX, newY, newZ)
@@ -379,18 +377,18 @@ function Qpocalypse15_BardClient.updateBardPlayerPositions()
             end
         end
     
-    -- 제거할 플레이어들 정리 (메모리 누수 방지)
+    -- Clean up players to remove (prevent memory leaks)
     for _, playerID in ipairs(playersToRemove) do
         local bardData = Qpocalypse15_BardClient.activeBardPlayers[playerID]
         if bardData then
-            -- 안전한 emitter 정리
+            -- Safely clean up emitter
             if bardData.emitter then
                 if bardData.soundID and bardData.emitter.stopSound then
                     bardData.emitter:stopSound(bardData.soundID)
                 else
                     bardData.emitter:stopAll()
                 end
-                -- emitter 참조 완전 제거
+                -- Remove emitter reference completely
                 bardData.emitter = nil
                 bardData.soundID = nil
             end
@@ -399,7 +397,7 @@ function Qpocalypse15_BardClient.updateBardPlayerPositions()
     end
 end
 
--- 자신의 바드 사운드 상태 확인
+-- Check own bard sound state
 function Qpocalypse15_BardClient.checkMyBardSound(player)
     if not player then return end
     
@@ -408,29 +406,29 @@ function Qpocalypse15_BardClient.checkMyBardSound(player)
     
     if myBardState and myBardState.state == Qpocalypse15_Bard.BardState.PLAYING then
         if myBardState.emitter and myBardState.soundID then
-            -- 안전한 isPlaying 호출
+            -- Safe isPlaying call
             local isStillPlaying = false
             if myBardState.emitter.isPlaying then
                 isStillPlaying = myBardState.emitter:isPlaying(myBardState.soundID)
             end
             
             if not isStillPlaying then
-                -- 자신의 사운드가 끝났으면 즉시 처리
+                -- Immediately process if own sound ended
                 myBardState.state = Qpocalypse15_Bard.BardState.IDLE
                 
-                -- 연주 상태 플래그 해제
+                -- Reset playing state flag
                 Qpocalypse15_BardClient.isCurrentlyPlaying = false
                 if myBardState.emitter then
                     myBardState.emitter:stopAll()
                 end
                 
-                -- 즉시 기타 파괴 (지연 없이)
+                -- Immediately destroy guitar (no delay)
                 if myBardState.guitar then
                     Qpocalypse15_BardClient.destroyGuitarItem(player, myBardState.guitar)
                     print("Qpocalypse15 Bard: My music ended, guitar destroyed immediately")
                 end
                 
-                -- 상태 초기화
+                -- Initialize state
                 Qpocalypse15_BardClient.playerBardState[playerID] = {
                     state = Qpocalypse15_Bard.BardState.IDLE,
                     musicFile = nil,
@@ -439,11 +437,11 @@ function Qpocalypse15_BardClient.checkMyBardSound(player)
                     soundID = nil
                 }
                 
-                -- 서버에 상태 업데이트 알림 (기타 파괴는 이미 완료)
+                -- Notify server of state update (guitar is already destroyed)
                 if sendClientCommand then
                     sendClientCommand(player, "Qpocalypse15_Bard", "StopPlaying", {
                         playerID = playerID,
-                        destroyGuitar = false  -- 이미 파괴했으므로 false
+                        destroyGuitar = false  -- Already destroyed, so false
                     })
                 end
             end
@@ -451,7 +449,7 @@ function Qpocalypse15_BardClient.checkMyBardSound(player)
     end
 end
 
--- 서버로부터 바드 시작 명령 처리
+-- Process bard start command from server
 local function onServerCommand(module, command, args)
     if module ~= "Qpocalypse15_Bard" then return end
     
@@ -459,31 +457,31 @@ local function onServerCommand(module, command, args)
         local playerID = args.playerID
         local musicFile = args.musicFile
         local x, y, z = args.x, args.y, args.z
-        -- 안전한 로컬 플레이어 가져오기
+        -- Get local player safely
         local localPlayer = nil
         if getPlayer then
             localPlayer = getPlayer()
         elseif getSpecificPlayer then
-            localPlayer = getSpecificPlayer(0) -- 싱글플레이어인 경우
+            localPlayer = getSpecificPlayer(0) -- For single player
         end
         
-        -- 거리 체크 (PLAY_RANGE 내에 있는지 확인)
+        -- Check distance (check if PLAY_RANGE is within)
         local shouldPlaySound = false
         if localPlayer then
             local distance = Qpocalypse15_Bard.getDistance(localPlayer:getX(), localPlayer:getY(), x, y)
             local isSameLevel = localPlayer:getZ() == z
             
             if localPlayer:getOnlineID() == playerID then
-                -- 자신의 바드는 항상 재생
+                -- Own bard always plays
                 shouldPlaySound = true
             elseif isSameLevel and distance <= Qpocalypse15_Bard.PLAY_RANGE then
-                -- 다른 플레이어의 바드는 범위 내에서만 재생
+                -- Other player's bard only plays if in range
                 shouldPlaySound = true
             end
         end
         
         if shouldPlaySound then
-            -- 음악 재생
+            -- Play music
             local emitter = getWorld():getFreeEmitter(x, y, z)
             if emitter then
                 local soundID = emitter:playSound(musicFile)
@@ -491,11 +489,11 @@ local function onServerCommand(module, command, args)
                 if not soundID then
                     print("Qpocalypse15 Bard: Failed to play sound: " .. musicFile)
                     
-                    -- 자신의 바드인 경우 상태 복구 필요
+                    -- Need to restore state if own bard
                     if localPlayer and localPlayer:getOnlineID() == playerID then
                         local myBardState = Qpocalypse15_BardClient.playerBardState[playerID]
                         if myBardState then
-                            -- 즉시 기타 파괴 및 상태 정리
+                            -- Immediately destroy guitar and clean up state
                             if myBardState.guitar then
                                 Qpocalypse15_BardClient.destroyGuitarItem(localPlayer, myBardState.guitar)
                                 print("Qpocalypse15 Bard: Guitar destroyed due to sound failure")
@@ -509,7 +507,7 @@ local function onServerCommand(module, command, args)
                                 soundID = nil
                             }
                             
-                            -- 서버에 실패 알림 (안전한 전송)
+                            -- Notify server of failure (safe transmission)
                             if sendClientCommand and localPlayer then
                                 sendClientCommand(localPlayer, "Qpocalypse15_Bard", "StopPlaying", {
                                     playerID = playerID,
@@ -521,22 +519,22 @@ local function onServerCommand(module, command, args)
                     return
                 end
                 
-                -- 자신인 경우와 다른 플레이어인 경우 구분
+                -- Distinguish between own and other players
                 if localPlayer and localPlayer:getOnlineID() == playerID then
-                    -- 자신의 바드 상태 업데이트
+                    -- Update own bard state
                     local myBardState = Qpocalypse15_BardClient.playerBardState[playerID]
                     if myBardState then
                         myBardState.emitter = emitter
                         myBardState.soundID = soundID
                     end
                 else
-                                    -- 다른 플레이어의 바드 상태 추가
+                -- Add other player's bard state
                 Qpocalypse15_BardClient.activeBardPlayers[playerID] = {
                     emitter = emitter,
                     soundID = soundID,
                     musicFile = musicFile,
                     x = x, y = y, z = z,
-                    resyncRequested = false  -- 재동기화 요청 플래그
+                    resyncRequested = false  -- Resync request flag
                 }
                 end
             else
@@ -555,7 +553,7 @@ local function onServerCommand(module, command, args)
             localPlayer = getSpecificPlayer(0)
         end
         
-        -- 자신의 바드인 경우 로컬 상태 정리
+        -- Clean up local state if own bard
         if localPlayer and localPlayer:getOnlineID() == playerID then
             local myBardState = Qpocalypse15_BardClient.playerBardState[playerID]
             if myBardState and myBardState.state == Qpocalypse15_Bard.BardState.PLAYING then
@@ -567,8 +565,8 @@ local function onServerCommand(module, command, args)
                     end
                 end
                 
-                -- 추가 기타 파괴 (중복 체크)
-                -- 이미 클라이언트에서 처리되었을 수 있지만 안전성을 위해 재확인
+                -- Additional guitar destruction (duplicate check)
+                -- May already be processed on client, but check for safety
                 if args.destroyGuitar then
                     local stillHasGuitar = false
                     local primaryItem = localPlayer:getPrimaryHandItem()
@@ -588,7 +586,7 @@ local function onServerCommand(module, command, args)
                     end
                 end
                 
-                -- 상태 초기화
+                -- Initialize state
                 Qpocalypse15_BardClient.playerBardState[playerID] = {
                     state = Qpocalypse15_Bard.BardState.IDLE,
                     musicFile = nil,
@@ -598,7 +596,7 @@ local function onServerCommand(module, command, args)
                 }
             end
         else
-            -- 다른 플레이어의 바드인 경우
+            -- If other player's bard
             local bardPlayer = Qpocalypse15_BardClient.activeBardPlayers[playerID]
             if bardPlayer and bardPlayer.emitter then
                 if bardPlayer.emitter.stopSound and bardPlayer.soundID then
@@ -609,23 +607,23 @@ local function onServerCommand(module, command, args)
             end
         end
         
-        -- 활성 바드 플레이어 목록에서 제거
+        -- Remove from active bard player list
         Qpocalypse15_BardClient.activeBardPlayers[playerID] = nil
     end
 end
 
--- 플레이어 사망 시 바드 상태 정리 (로컬만, 서버는 자체적으로 정리)
+-- Clean up bard state when player dies (local only, server handles itself)
 local function onPlayerDeath(player)
     if not player then return end
     
     local playerID = player:getOnlineID()
     local localPlayer = getPlayer()
     
-    -- 로컬 플레이어가 죽은 경우 자신의 바드 상태 정리
+    -- Clean up own bard state if local player died
     if localPlayer and localPlayer:getOnlineID() == playerID then
         local bardState = Qpocalypse15_BardClient.playerBardState[playerID]
         if bardState and bardState.state == Qpocalypse15_Bard.BardState.PLAYING then
-            -- 사운드 중지
+            -- Stop sound
             if bardState.emitter and bardState.soundID then
                 if bardState.emitter.stopSound then
                     bardState.emitter:stopSound(bardState.soundID)
@@ -634,7 +632,7 @@ local function onPlayerDeath(player)
                 end
             end
             
-            -- 상태 초기화
+            -- Initialize state
             Qpocalypse15_BardClient.playerBardState[playerID] = {
                 state = Qpocalypse15_Bard.BardState.IDLE,
                 musicFile = nil,
@@ -643,14 +641,14 @@ local function onPlayerDeath(player)
                 soundID = nil
             }
             
-            -- 연주 상태 플래그 해제
+            -- Reset playing state flag
             Qpocalypse15_BardClient.isCurrentlyPlaying = false
             
             print("Qpocalypse15 Bard: Local player died, bard state cleared")
         end
     end
     
-    -- 다른 플레이어가 죽은 경우 activeBardPlayers에서 제거
+    -- Remove from activeBardPlayers if other player died
     if Qpocalypse15_BardClient.activeBardPlayers[playerID] then
         local bardData = Qpocalypse15_BardClient.activeBardPlayers[playerID]
         if bardData.emitter then
@@ -665,7 +663,7 @@ local function onPlayerDeath(player)
     end
 end
 
--- 이벤트 등록
+-- Register events
 Events.OnFillInventoryObjectContextMenu.Add(onFillInventoryObjectContextMenu)
 Events.OnPlayerUpdate.Add(onPlayerUpdate)
 Events.OnServerCommand.Add(onServerCommand)

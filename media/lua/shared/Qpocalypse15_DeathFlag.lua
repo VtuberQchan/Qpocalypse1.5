@@ -1,18 +1,17 @@
--- Qpocalypse15 DeathFlag System - Main Module
--- DeathFlag 시스템 메인 모듈
+-- Main module for DeathFlag system
 
 Qpocalypse15_DeathFlag = Qpocalypse15_DeathFlag or {}
 
--- 디버그 로그 함수
+-- Debug log function
 local function DebugLog(message)
     print("[Qpocalypse15 DeathFlag] " .. message)
 end
 
--- 시스템 초기화
+-- System initialization
 function Qpocalypse15_DeathFlag.init()
     DebugLog("DeathFlag init...")
     
-    -- 클라이언트 측 초기화
+    -- Client-side initialization
     if isClient() or not isServer() then
         DebugLog("Client DeathFlag init...")
         local success, err = pcall(function()
@@ -23,7 +22,7 @@ function Qpocalypse15_DeathFlag.init()
         end
     end
     
-    -- 서버 측 초기화
+    -- Server-side initialization
     if isServer() or not isClient() then
         DebugLog("Server DeathFlag init...")
         local success1, err1 = pcall(function()
@@ -44,5 +43,5 @@ function Qpocalypse15_DeathFlag.init()
     DebugLog("DeathFlag init complete!")
 end
 
--- 게임 시작 시 초기화
+-- Initialize on game start
 Events.OnGameStart.Add(Qpocalypse15_DeathFlag.init) 

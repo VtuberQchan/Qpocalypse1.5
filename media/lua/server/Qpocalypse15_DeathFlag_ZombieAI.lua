@@ -1,23 +1,23 @@
 -- Qpocalypse15 DeathFlag Zombie AI Hooks
--- 좀비 AI 후킹 및 DeathFlag 효과 적용
+-- Zombie AI hooks and DeathFlag effect application
 
 require "server/Qpocalypse15_DeathFlag_Server"
 
--- 성능 최적화를 위한 캐시 변수들
+-- Cache variables for performance optimization
 local lastUpdateTime = 0
-local UPDATE_INTERVAL = 500 -- 0.5초마다 업데이트 (500ms) - 더 반응적
+local UPDATE_INTERVAL = 500 -- Update every 0.5 seconds (500ms) - more responsive
 
--- 좀비 AI 수정을 위한 주기적 업데이트 함수
+-- Periodic update function for modifying zombie AI
 local function updateZombiesForDeathFlag()
     local currentTime = getTimestamp()
     
-    -- 성능 최적화: 1초마다만 실행
+    -- Performance optimization: only run every second
     if (currentTime - lastUpdateTime) < UPDATE_INTERVAL then
         return
     end
     lastUpdateTime = currentTime
     
-    -- 활성화된 DeathFlag가 없으면 건너뛰기
+    -- Skip if there are no activated DeathFlags
     if not Qpocalypse15_DeathFlag.activeFlags then
         return
     end
@@ -32,25 +32,25 @@ local function updateZombiesForDeathFlag()
         return
     end
     
-    -- 모든 플레이어 주변의 좀비들 처리
+    -- Process all zombies around all players
     for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
         local flagPlayer = flagData.player
         if flagPlayer and not flagPlayer:isDead() then
-            -- 플레이어의 현재 위치를 실시간으로 사용 (이동 가능)
+            -- Use current player position in real-time (movable)
             local flagX = flagPlayer:getX()
             local flagY = flagPlayer:getY()
             local range = flagData.range
             
-            -- 주변 좀비들 찾기 (정확한 방법)
+            -- Find nearby zombies (exact method)
             local cell = getCell()
             if cell then
-                -- 정수 좌표로 변환 및 범위 체크
+                -- Convert to integer coordinates and check range
                 local startX = math.max(0, math.floor(flagX - range))
                 local endX = math.min(cell:getMaxX(), math.floor(flagX + range))
                 local startY = math.max(0, math.floor(flagY - range))
                 local endY = math.min(cell:getMaxY(), math.floor(flagY + range))
                 
-                -- 모든 타일을 체크 (성능 최적화: 2칸씩 건너뛰기로 타협)
+                -- Check all tiles (performance optimization: skip 2 tiles)
                 for x = startX, endX, 2 do
                     for y = startY, endY, 2 do
                         local square = cell:getGridSquare(x, y, 0)
@@ -64,14 +64,14 @@ local function updateZombiesForDeathFlag()
                                         local zombieY = zombie:getY()
                                         local distance = math.sqrt((zombieX - flagX)^2 + (zombieY - flagY)^2)
                                         if distance <= range then
-                                            -- 좀비를 DeathFlag 사용자에게 집중시키기
+                                            -- Focus the zombie on the DeathFlag user
                                             local currentTarget = zombie:getTarget()
                                             if not currentTarget or 
                                               (instanceof(currentTarget, "IsoPlayer") and currentTarget ~= flagPlayer) then
                                                 zombie:setTarget(flagPlayer)
-                                                zombie:setTargetSeenTime(2500) -- 2.5초간 강제 타겟
+                                                zombie:setTargetSeenTime(2500) -- Force target for 2.5 seconds
                                                 
-                                                -- 좀비가 확실히 DeathFlag 사용자를 향하도록 추가 설정
+                                                -- Additional setting to ensure the zombie is definitely targeting the DeathFlag user
                                                 if zombie:getModData then
                                                     local modData = zombie:getModData()
                                                     modData.deathFlagTarget = flagPlayer:getOnlineID()
@@ -90,11 +90,11 @@ local function updateZombiesForDeathFlag()
     end
 end
 
--- 좀비가 플레이어를 감지하는 과정을 차단하는 함수
+-- Function to block the process of zombies detecting players
 local function onZombieUpdate(zombie)
     if not zombie or zombie:isDead() then return end
     
-    -- 활성화된 DeathFlag가 없으면 건너뛰기
+    -- Skip if there are no activated DeathFlags
     local hasActiveFlags = false
     for _ in pairs(Qpocalypse15_DeathFlag.activeFlags) do
         hasActiveFlags = true
@@ -105,14 +105,14 @@ local function onZombieUpdate(zombie)
     
     local currentTarget = zombie:getTarget()
     if currentTarget and instanceof(currentTarget, "IsoPlayer") then
-        -- 현재 타겟이 DeathFlag 보호 범위에 있는지 확인
+        -- Check if the current target is within the DeathFlag protection range
         if not Qpocalypse15_DeathFlag.isPlayerVisibleToZombie(currentTarget, zombie) then
-            -- 보호된 플레이어는 타겟에서 제거하고 DeathFlag 사용자로 리디렉션
+            -- Protected players are removed from the target and redirected to the DeathFlag user
                              for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
                  local flagPlayer = flagData.player
                  if flagPlayer and isZombieInDeathFlagRange(zombie, flagPlayer, flagData.range) then
                      zombie:setTarget(flagPlayer)
-                     zombie:setTargetSeenTime(3000) -- 3초간 강제 타겟
+                     zombie:setTargetSeenTime(3000) -- Force target for 3 seconds
                      break
                  end
              end
@@ -120,15 +120,15 @@ local function onZombieUpdate(zombie)
     end
 end
 
--- 좀비 노이즈 반응 후킹
+-- Zombie noise response hook
 local function onZombieHearNoise(zombie, noiseSource, volume, x, y)
     if not zombie or zombie:isDead() then return end
     
-    -- DeathFlag 활성화 체크
+    -- Check if DeathFlag is activated
          for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
          local flagPlayer = flagData.player
          if flagPlayer and isZombieInDeathFlagRange(zombie, flagPlayer, flagData.range) then
-             -- 범위 내에서 발생한 모든 노이즈를 DeathFlag 사용자로 리디렉션
+             -- Redirect all noise within the range to the DeathFlag user
              zombie:setTarget(flagPlayer)
              zombie:setTargetSeenTime(3000)
              return
@@ -136,7 +136,7 @@ local function onZombieHearNoise(zombie, noiseSource, volume, x, y)
      end
 end
 
--- 공통 범위 체크 함수
+-- Common range check function
 local function isZombieInDeathFlagRange(zombie, flagPlayer, flagRange)
     if not zombie or not flagPlayer or zombie:isDead() or flagPlayer:isDead() then
         return false
@@ -151,8 +151,8 @@ local function isZombieInDeathFlagRange(zombie, flagPlayer, flagRange)
     return distance <= flagRange
 end
 
--- 이벤트 등록 (성능 최적화된 버전)
--- OnTick은 전체적인 좀비 타겟팅 관리용
+-- Register events (optimized version)
+-- OnTick is for overall zombie targeting management
 Events.OnTick.Add(updateZombiesForDeathFlag)
--- OnZombieUpdate는 개별 좀비의 실시간 반응용 (더 즉각적)
+-- OnZombieUpdate is for individual zombie's real-time response (more immediate)
 Events.OnZombieUpdate.Add(onZombieUpdate) 

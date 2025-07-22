@@ -1,11 +1,11 @@
 -- Qpocalypse15 Bard System - Shared Module
--- 바드 시스템의 공유 기능들
+-- Shared functions for the Bard system
 
 Qpocalypse15_Bard = {}
 
--- 바드 시스템 관련 상수들
-Qpocalypse15_Bard.PLAY_RANGE = 20  -- 연주 효과 범위
-Qpocalypse15_Bard.CALM_RANGE = 20  -- 진정 효과 범위
+-- Constants related to the Bard system
+Qpocalypse15_Bard.PLAY_RANGE = 20  -- Play effect range
+Qpocalypse15_Bard.CALM_RANGE = 20  -- Calm effect range
 Qpocalypse15_Bard.MUSIC_FILES = {
     "Bardmusic1",
     "Bardmusic2", 
@@ -14,19 +14,19 @@ Qpocalypse15_Bard.MUSIC_FILES = {
     "Bardmusic5"
 }
 
--- 바드 상태
+-- Bard state
 Qpocalypse15_Bard.BardState = {
     IDLE = 0,
     PLAYING = 1
 }
 
--- 음악 파일을 랜덤으로 선택
+-- Select a random music file
 function Qpocalypse15_Bard.getRandomMusicFile()
     local index = ZombRand(#Qpocalypse15_Bard.MUSIC_FILES) + 1
     return Qpocalypse15_Bard.MUSIC_FILES[index]
 end
 
--- 플레이어가 바드 기타를 장비하고 있는지 확인
+-- Check if the player is equipped with a bard guitar
 function Qpocalypse15_Bard.isPlayerEquippedWithBardGuitar(player)
     if not player then return false end
     
@@ -43,28 +43,28 @@ function Qpocalypse15_Bard.isPlayerEquippedWithBardGuitar(player)
     return false
 end
 
--- 거리 계산 함수
+-- Distance calculation function
 function Qpocalypse15_Bard.getDistance(x1, y1, x2, y2)
     local dx = x1 - x2
     local dy = y1 - y2
     return math.sqrt(dx * dx + dy * dy)
 end
 
--- 범위 내 플레이어들 찾기
+-- Find players within a range
 function Qpocalypse15_Bard.getPlayersInRange(centerPlayer, range)
     local players = {}
     local centerX = centerPlayer:getX()
     local centerY = centerPlayer:getY()
     local centerZ = centerPlayer:getZ()
     
-    -- 싱글플레이/멀티플레이 호환 플레이어 목록 가져오기
+    -- Get a list of players (single/multiplayer compatible)
     local allPlayers = nil
     if isClient() and getOnlinePlayers then
         allPlayers = getOnlinePlayers()
     elseif IsoPlayer.getPlayers then
         allPlayers = IsoPlayer.getPlayers()
     else
-        -- 플레이어 목록을 가져올 수 없으면 빈 테이블 반환
+        -- If the player list cannot be obtained, return an empty table
         return players
     end
     

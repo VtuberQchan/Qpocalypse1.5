@@ -1,10 +1,9 @@
 -- Qpocalypse15 DeathFlag System - Client Module
--- 클라이언트 측 DeathFlag 시스템 구현
 
 require "Qpocalypse15_DeathFlag_TimedAction"
 
 Qpocalypse15_DeathFlagClient = {}
--- DeathFlag 컨텍스트 메뉴 추가
+-- Add DeathFlag context menu
 local function onFillInventoryObjectContextMenu(player, context, items)
     if not player or not items then return end
     local items = ISInventoryPane.getActualItems(items)
@@ -17,7 +16,7 @@ local function onFillInventoryObjectContextMenu(player, context, items)
     end
 end
 
--- DeathFlag 사용 시작
+-- Start using DeathFlag
 function Qpocalypse15_DeathFlagClient.useDeathFlag()
     local player = getPlayer()
     local item = player:getInventory():getFirstTypeRecurse("Qpocalypse15.DeathFlag")
@@ -27,47 +26,47 @@ function Qpocalypse15_DeathFlagClient.useDeathFlag()
         return 
     end
     
-    -- 플레이어 상태 검사
+    -- Check player state
     if player:isDead() then
         print("[DeathFlag Error] Dead players cannot use DeathFlag")
         return
     end
     
-    -- 아이템 타입 검사
+    -- Check item type
     if item:getFullType() ~= "Qpocalypse15.DeathFlag" then
         print("[DeathFlag Error] Invalid item type: " .. tostring(item:getFullType()))
         return
     end
     
-    -- TimedAction 큐에 추가
+    -- Add to TimedAction queue
     ISTimedActionQueue.add(ISQPDeathFlagAction:new(player, item))
 end
 
--- 서버 명령 처리
+-- Process server command
 local function onServerCommand(module, command, args)
     if module ~= "Qpocalypse15_DeathFlag" then return end
     
     if command == "DeathFlagActivated" then
-        -- DeathFlag가 활성화되었을 때 클라이언트 처리
+        -- Client processing when DeathFlag is activated
         local playerID = args.playerID
         local localPlayer = getPlayer()
         
         if localPlayer and localPlayer:getOnlineID() == playerID then
-            -- 자신이 DeathFlag를 사용한 경우
+            -- If you used DeathFlag
             print("[DeathFlag] 사망 플래그가 활성화되었습니다!")
         end
     elseif command == "DeathFlagDeactivated" then
-        -- DeathFlag 효과가 끝났을 때 클라이언트 처리
+        -- Client processing when DeathFlag effect ends
         local playerID = args.playerID
         local localPlayer = getPlayer()
         
         if localPlayer and localPlayer:getOnlineID() == playerID then
-            -- 자신의 DeathFlag 효과가 끝난 경우
+            -- If your DeathFlag effect ends
             print("[DeathFlag] 사망 플래그 효과가 종료되었습니다.")
         end
     end
 end
 
--- 이벤트 등록
+-- Register events
 Events.OnFillInventoryObjectContextMenu.Add(onFillInventoryObjectContextMenu)
 Events.OnServerCommand.Add(onServerCommand) 

@@ -1,12 +1,12 @@
 -- Qpocalypse15 DeathFlag System - Server Module
--- 서버 측 DeathFlag 시스템 구현
+-- Server-side implementation of the DeathFlag system
 
 Qpocalypse15_DeathFlag = {}
 
--- 활성화된 DeathFlag 정보를 저장하는 테이블
+-- Table to store activated DeathFlag information
 Qpocalypse15_DeathFlag.activeFlags = {}
 
--- DeathFlag 활성화 함수
+-- DeathFlag activation function
 function Qpocalypse15_DeathFlag.activateDeathFlag(player, args)
     if not player or not args then return end
     
@@ -15,20 +15,20 @@ function Qpocalypse15_DeathFlag.activateDeathFlag(player, args)
     local y = args.y or player:getY()
     local z = args.z or player:getZ()
     
-    -- DeathFlag 정보 저장
+    -- Save DeathFlag information
     Qpocalypse15_DeathFlag.activeFlags[playerID] = {
         player = player,
         x = x,
         y = y,
         z = z,
         startTime = getTimestamp(),
-        duration = 15000, -- 15초 (밀리초)
-        range = 20 -- 20칸 범위
+        duration = 15000, -- 15 seconds (milliseconds)
+        range = 20 -- 20 blocks range
     }
     
     print("[DeathFlag Server] DeathFlag activated for player " .. tostring(playerID))
     
-    -- 클라이언트에 알림
+    -- Notify client
     if isServer() then
         sendServerCommand("Qpocalypse15_DeathFlag", "DeathFlagActivated", {
             playerID = playerID,
@@ -36,20 +36,20 @@ function Qpocalypse15_DeathFlag.activateDeathFlag(player, args)
         })
     end
     
-    -- 글로벌 타이머 시작
+    -- Start global timer
     Qpocalypse15_DeathFlag.startGlobalTimer()
 end
 
--- DeathFlag 비활성화 함수
+-- DeathFlag deactivation function
 function Qpocalypse15_DeathFlag.deactivateDeathFlag(playerID)
     if not Qpocalypse15_DeathFlag.activeFlags[playerID] then return end
     
     print("[DeathFlag Server] DeathFlag deactivated for player " .. tostring(playerID))
     
-    -- 데이터 제거
+    -- Remove data
     Qpocalypse15_DeathFlag.activeFlags[playerID] = nil
     
-    -- 클라이언트에 알림
+    -- Notify client
     if isServer() then
         sendServerCommand("Qpocalypse15_DeathFlag", "DeathFlagDeactivated", {
             playerID = playerID
@@ -57,31 +57,31 @@ function Qpocalypse15_DeathFlag.deactivateDeathFlag(playerID)
     end
 end
 
--- 좀비가 플레이어를 타겟팅할 때 호출되는 함수
+-- Function called when a zombie targets a player
 function Qpocalypse15_DeathFlag.modifyZombieTarget(zombie, originalTarget)
     if not zombie or not originalTarget then return originalTarget end
     
-    -- 활성화된 DeathFlag가 있는지 확인
+    -- Check if there is an activated DeathFlag
     for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
         local flagPlayer = flagData.player
         if flagPlayer and not flagPlayer:isDead() then
             local zombieX = zombie:getX()
             local zombieY = zombie:getY()
-            -- 플레이어의 현재 위치를 실시간으로 사용
+            -- Use current player position in real-time
             local flagX = flagPlayer:getX()
             local flagY = flagPlayer:getY()
             
-            -- 좀비가 DeathFlag 범위 내에 있는지 확인
+            -- Check if the zombie is within the DeathFlag range
             local distanceToFlag = math.sqrt((zombieX - flagX)^2 + (zombieY - flagY)^2)
             if distanceToFlag <= flagData.range then
                 
-                -- 원래 타겟이 DeathFlag 사용자가 아니고, 범위 내의 다른 플레이어라면
+                -- If the original target is not the DeathFlag user and is within the range of another player
                 if originalTarget ~= flagPlayer then
                     local targetX = originalTarget:getX()
                     local targetY = originalTarget:getY()
                     local distanceTargetToFlag = math.sqrt((targetX - flagX)^2 + (targetY - flagY)^2)
                     
-                    -- 원래 타겟이 DeathFlag 범위 내에 있다면 DeathFlag 사용자로 타겟 변경
+                    -- If the original target is within the DeathFlag range, change the target to the DeathFlag user
                     if distanceTargetToFlag <= flagData.range then
                         return flagPlayer
                     end
@@ -93,15 +93,15 @@ function Qpocalypse15_DeathFlag.modifyZombieTarget(zombie, originalTarget)
     return originalTarget
 end
 
--- 플레이어가 좀비에게 보이는지 확인하는 함수 (좀비 인식 차단)
+-- Function to check if a player is visible to a zombie (zombie recognition block)
 function Qpocalypse15_DeathFlag.isPlayerVisibleToZombie(player, zombie)
     if not player or not zombie then return true end
     
     local playerID = player:getOnlineID()
     
-    -- 활성화된 DeathFlag가 있는지 확인
+    -- Check if there is an activated DeathFlag
     for flagPlayerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
-        -- 자신이 DeathFlag 사용자라면 정상적으로 보임
+        -- If you are the DeathFlag user, it will be normal
         if playerID == flagPlayerID then
             return true
         end
@@ -110,14 +110,14 @@ function Qpocalypse15_DeathFlag.isPlayerVisibleToZombie(player, zombie)
         if flagPlayer and not flagPlayer:isDead() then
             local playerX = player:getX()
             local playerY = player:getY()
-            -- 플레이어의 현재 위치를 실시간으로 사용
+            -- Use current player position in real-time
             local flagX = flagPlayer:getX()
             local flagY = flagPlayer:getY()
             
-            -- 플레이어가 DeathFlag 범위 내에 있는지 확인
+            -- Check if the player is within the DeathFlag range
             local distanceToFlag = math.sqrt((playerX - flagX)^2 + (playerY - flagY)^2)
             if distanceToFlag <= flagData.range then
-                -- 범위 내의 다른 플레이어는 좀비가 볼 수 없음
+                -- Other players within the range cannot be seen by zombies
                 return false
             end
         end
@@ -126,7 +126,7 @@ function Qpocalypse15_DeathFlag.isPlayerVisibleToZombie(player, zombie)
     return true
 end
 
--- 클라이언트 명령 처리
+-- Process client commands
 local function onClientCommand(module, command, player, args)
     if module ~= "Qpocalypse15_DeathFlag" then return end
     
@@ -135,7 +135,7 @@ local function onClientCommand(module, command, player, args)
     end
 end
 
--- 글로벌 타이머 (메모리 누수 방지)
+-- Global timer (memory leak prevention)
 local globalTimerActive = false
 
 local function globalTimer()
@@ -146,19 +146,19 @@ local function globalTimer()
     
     for playerID, flagData in pairs(Qpocalypse15_DeathFlag.activeFlags) do
         if flagData then
-            local elapsedTime = currentTime - flagData.startTime -- 밀리초 단위로 직접 비교
+            local elapsedTime = currentTime - flagData.startTime -- Direct comparison in milliseconds
             if elapsedTime >= flagData.duration then
                 table.insert(toRemove, playerID)
             end
         end
     end
     
-    -- 만료된 플래그들 제거
+    -- Remove expired flags
     for _, playerID in ipairs(toRemove) do
         Qpocalypse15_DeathFlag.deactivateDeathFlag(playerID)
     end
     
-    -- 더 이상 활성 플래그가 없으면 타이머 중지
+    -- If there are no more active flags, stop the timer
     local hasActiveFlags = false
     for _ in pairs(Qpocalypse15_DeathFlag.activeFlags) do
         hasActiveFlags = true
@@ -171,7 +171,7 @@ local function globalTimer()
     end
 end
 
--- 타이머 활성화 함수
+-- Function to activate the timer
 function Qpocalypse15_DeathFlag.startGlobalTimer()
     if not globalTimerActive then
         globalTimerActive = true
@@ -179,13 +179,13 @@ function Qpocalypse15_DeathFlag.startGlobalTimer()
     end
 end
 
--- 타이머 중지 함수
+-- Function to stop the timer
 function Qpocalypse15_DeathFlag.stopGlobalTimer()
     globalTimerActive = false
     Events.OnTick.Remove(globalTimer)
 end
 
--- 플레이어 연결 해제 시 DeathFlag 정리
+-- Clean up DeathFlag when a player disconnects
 local function onDisconnect(player)
     if not player then return end
     
@@ -196,7 +196,7 @@ local function onDisconnect(player)
     end
 end
 
--- 플레이어 사망 시 DeathFlag 정리
+-- Clean up DeathFlag when a player dies
 local function onPlayerDeath(player)
     if not player then return end
     
@@ -207,7 +207,6 @@ local function onPlayerDeath(player)
     end
 end
 
--- 이벤트 등록
 Events.OnClientCommand.Add(onClientCommand)
 Events.OnDisconnect.Add(onDisconnect)
 Events.OnPlayerDeath.Add(onPlayerDeath) 

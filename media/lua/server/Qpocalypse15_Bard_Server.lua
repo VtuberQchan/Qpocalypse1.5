@@ -1,28 +1,28 @@
 -- Qpocalypse15 Bard System - Server Module
--- 서버 측 바드 시스템 구현
+-- Server-side implementation of the Bard system
 
 require "shared/Qpocalypse15_Bard"
 
 Qpocalypse15_BardServer = {}
 
--- 서버 측 바드 상태 관리
+-- Server-side management of bard states
 Qpocalypse15_BardServer.activeBards = {}
 
--- 바드 연주 시작 처리
+-- Process starting bard playing
 function Qpocalypse15_BardServer.startBardPlaying(player, musicFile)
     if not player or not musicFile then return end
     
     local playerID = player:getOnlineID()
     local x, y, z = player:getX(), player:getY(), player:getZ()
     
-    -- 바드 상태 저장
+    -- Save bard state
     Qpocalypse15_BardServer.activeBards[playerID] = {
         player = player,
         musicFile = musicFile,
         x = x, y = y, z = z
     }
     
-    -- 모든 클라이언트에 음악 재생 명령 전송 (안전한 전송)
+    -- Send music playing command to all clients (safe transmission)
     if sendServerCommand then
         sendServerCommand("Qpocalypse15_Bard", "StartPlayingForClients", {
             playerID = playerID,
@@ -34,7 +34,7 @@ function Qpocalypse15_BardServer.startBardPlaying(player, musicFile)
     print("Qpocalypse15 Bard: Player " .. player:getDisplayName() .. " started playing " .. musicFile)
 end
 
--- 바드 연주 중지 처리
+-- Process stopping bard playing
 function Qpocalypse15_BardServer.stopBardPlaying(player, destroyGuitar)
     if not player then return end
     
@@ -42,19 +42,19 @@ function Qpocalypse15_BardServer.stopBardPlaying(player, destroyGuitar)
     local bardData = Qpocalypse15_BardServer.activeBards[playerID]
     
     if bardData then
-        -- 기타 파괴는 클라이언트에서만 가능하므로 서버에서는 처리하지 않음
+        -- Guitar destruction is only possible on the client, so server does not handle it
         if destroyGuitar then
             print("Qpocalypse15 Bard: Guitar destruction requested for player: " .. player:getDisplayName() .. " (handled by client)")
         end
         
-        -- 바드 상태 제거
+        -- Remove bard state
         Qpocalypse15_BardServer.activeBards[playerID] = nil
         
-        -- 모든 클라이언트에 음악 중지 명령 전송 (destroyGuitar 정보 포함)
+        -- Send music stop command to all clients (include destroyGuitar information)
         if sendServerCommand then
             sendServerCommand("Qpocalypse15_Bard", "StopPlayingForClients", {
                 playerID = playerID,
-                destroyGuitar = destroyGuitar  -- 클라이언트에서 추가 기타 파괴 여부 결정용
+                destroyGuitar = destroyGuitar  -- For client to determine additional guitar destruction
             })
         end
         
@@ -62,7 +62,7 @@ function Qpocalypse15_BardServer.stopBardPlaying(player, destroyGuitar)
     end
 end
 
--- 바드 상태 정리 (연결 해제된 플레이어나 죽은 플레이어 처리)
+-- Clean up bard states (handle disconnected/dead players)
 function Qpocalypse15_BardServer.cleanupBardStates()
     local playersToRemove = {}
     
@@ -74,7 +74,7 @@ function Qpocalypse15_BardServer.cleanupBardStates()
         end
     end
     
-    -- 정리할 플레이어들 제거
+    -- Remove players to clean up
     for _, playerID in ipairs(playersToRemove) do
         Qpocalypse15_BardServer.activeBards[playerID] = nil
         if sendServerCommand then
@@ -86,7 +86,7 @@ function Qpocalypse15_BardServer.cleanupBardStates()
     end
 end
 
--- 클라이언트 명령 처리
+-- Process client commands
 local function onClientCommand(module, command, player, args)
     if module ~= "Qpocalypse15_Bard" then return end
     
@@ -94,7 +94,7 @@ local function onClientCommand(module, command, player, args)
     
     if command == "StartPlaying" then
         local musicFile = args.musicFile
-        -- 보안: 요청자가 실제로 바드 기타를 가지고 있는지 확인
+        -- Security check: Verify if the requester actually has a bard guitar
         if Qpocalypse15_Bard.isPlayerEquippedWithBardGuitar(player) then
             Qpocalypse15_BardServer.startBardPlaying(player, musicFile)
         else
@@ -105,7 +105,7 @@ local function onClientCommand(module, command, player, args)
         local destroyGuitar = args.destroyGuitar
         local playerID = player:getOnlineID()
         
-        -- 보안: 요청자가 실제로 바드 상태에 있는지 확인
+        -- Security check: Verify if the requester is actually in bard state
         if Qpocalypse15_BardServer.activeBards[playerID] then
             Qpocalypse15_BardServer.stopBardPlaying(player, destroyGuitar)
         else
@@ -117,7 +117,7 @@ local function onClientCommand(module, command, player, args)
         local bardData = Qpocalypse15_BardServer.activeBards[targetPlayerID]
         
         if bardData and bardData.player and not bardData.player:isDead() then
-            -- 해당 플레이어가 여전히 유효하고 연주 중이면 요청자에게 다시 전송
+            -- If the player is still valid and playing, resend to requester
             if sendClientCommand then
                 sendClientCommand(player, "Qpocalypse15_Bard", "StartPlayingForClients", {
                     playerID = targetPlayerID,
@@ -134,7 +134,7 @@ local function onClientCommand(module, command, player, args)
     end
 end
 
--- 플레이어 연결 해제 시 바드 상태 정리
+-- Clean up bard state when player disconnects
 local function onDisconnect(player)
     if not player then return end
     
@@ -144,14 +144,14 @@ local function onDisconnect(player)
     end
 end
 
--- 정기적인 바드 상태 정리 (1분마다)
+-- Regular bard state cleanup (every in-game minute)
 local function onEveryOneMinute()
     Qpocalypse15_BardServer.cleanupBardStates()
 end
 
--- 타이머 관리 함수 제거됨 - 클라이언트에서 사운드 종료를 정확히 감지하므로 불필요
+-- Timer management function removed - not needed as client accurately detects sound end
 
--- 이벤트 등록
+-- Register events
 Events.OnClientCommand.Add(onClientCommand)
 Events.OnDisconnect.Add(onDisconnect)
-Events.EveryOneMinute.Add(onEveryOneMinute) -- 인게임 1분마다 상태 정리 
+Events.EveryOneMinute.Add(onEveryOneMinute)
