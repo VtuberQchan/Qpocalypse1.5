@@ -1,0 +1,11 @@
+ContextMenu_EN = {
+    ContextMenu_Inject = "Inject",
+    ContextMenu_BurnTreatment = "Apply Burn Cream",
+    ContextMenu_PackHemostatic = "Apply Hemostatic",
+    ContextMenu_Tourniquet = "Apply Tourniquet",
+    
+	ContextMenu_Qpocalypse15_Action = "Perform Emergency Surgery on %s",
+	ContextMenu_Qpocalypse15_ActionUnavailable = "Emergency Surgery Unavailable",
+	ContextMenu_Qpocalypse15_PlayBard = "Become a Bard of the Battlefield",
+	ContextMenu_Qpocalypse15_DeathFlag = "Raise Death Flag",
+}

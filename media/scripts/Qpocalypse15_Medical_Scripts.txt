@@ -1,0 +1,856 @@
+module Qpocalypse15
+{
+    model QP_PillsCommercialPainkillers
+    {
+        mesh = WorldItems/PainKillers,
+        texture = WorldItems/QP_PillsCommercialPainkillers,
+        scale = 0.4,
+    }
+    
+    item PillsCommercialPainkillers
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    0.1,
+        UseWhileEquipped    =    FALSE,
+        DisplayName    =    CommercialPainkillers,
+        Icon    =    PillsCommercialPainkillers,
+        Tooltip = Tooltip_PillsCommercialPainkillers,
+        StaticModel = PillBottle,
+        WorldStaticModel = QP_PillsCommercialPainkillers,
+        Medical = TRUE,
+    }
+    
+    recipe Make PillsCommercialPainkillers
+    {
+        keep MortarPestle,
+        Flour=2,
+        Water=1,
+        BlackSage=5,
+        Pills=10,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=4,
+        Result:PillsCommercialPainkillers,
+	    Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_PillsPrescriptionPainkillers
+    {
+        mesh = WorldItems/PainKillers,
+        texture = WorldItems/QP_PillsPrescriptionPainkillers,
+        scale = 0.4,
+    }
+    
+    item PillsPrescriptionPainkillers
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    0.1,
+        UseWhileEquipped    =    FALSE,
+        DisplayName    =    PillsPrescriptionPainkillers,
+        Icon    =    PillsPrescriptionPainkillers,
+        Tooltip = Tooltip_PillsPrescriptionPainkillers,
+        StaticModel = PillBottle,
+        WorldStaticModel = QP_PillsPrescriptionPainkillers,
+        Medical = TRUE,
+    }
+    
+    recipe Make PillsPrescriptionPainkillers
+    {
+        keep MortarPestle,
+        Flour=2,
+        Water=1,
+        CommonMallow=10,
+        BlackSage=15,
+        PillsCommercialPainkillers=10,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor15,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=6,
+        Result:PillsPrescriptionPainkillers,
+	    Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_PillsCaffeine
+    {
+        mesh = WorldItems/PainKillers,
+        texture = WorldItems/QP_PillsCaffeine,
+        scale = 0.4,
+    }
+    
+    item PillsCaffeine
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    0.1,
+        UseWhileEquipped    =    FALSE,
+        DisplayName    =    PillsCaffeine,
+        Icon    =    PillsCaffeine,
+        Tooltip = Tooltip_PillsCaffeine,
+        StaticModel = PillBottle,
+        WorldStaticModel = QP_PillsCaffeine,
+        Medical = TRUE,
+    }
+    
+    recipe Make PillsCaffeine
+    {
+        keep MortarPestle,
+        Flour=2,
+        Water=1,
+        Coffee2;15,
+        PillsVitamins=10,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=4,
+        Result:PillsCaffeine,
+	    Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_PillsCommercialAntibiotic
+    {
+        mesh = WorldItems/Antibiotics,
+        texture = WorldItems/QP_PillsCommercialAntibiotic,
+        scale = 0.6,
+    }
+    
+    item PillsCommercialAntibiotic
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    1,
+        UseWhileEquipped    =    FALSE,
+        DisplayName    =    PillsCommercialAntibiotic,
+        Icon    =    PillsCommercialAntibiotic,
+        Tooltip = Tooltip_PillsCommercialAntibiotic,
+        StaticModel = PillBottle,
+        WorldStaticModel = QP_PillsCommercialAntibiotic,
+        Medical = TRUE,
+    }
+    
+    recipe Make PillsCommercialAntibiotic
+    {
+        keep MortarPestle,
+        Flour=2,
+        Water=1,
+        Violets=10,
+        WildGarlic2;10,
+        Antibiotics=1,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=4,
+        Result:PillsCommercialAntibiotic,
+	    Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_PillsAntiPoisoning
+    {
+        mesh = WorldItems/PainKillers,
+        texture = WorldItems/QP_PillsAntiPoisoning,
+        scale = 0.4,
+    }
+    
+    item PillsAntiPoisoning
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    0.1,
+        UseWhileEquipped    =    FALSE,
+        DisplayName    =    PillsAntiPoisoning,
+        Icon    =    PillsAntiPoisoning,
+        Tooltip = Tooltip_PillsAntiPoisoning,
+        StaticModel = PillBottle,
+        WorldStaticModel = QP_PillsAntiPoisoning,
+        Medical = TRUE,
+    }
+    
+    recipe Make PillsAntiPoisoning
+    {
+        keep MortarPestle,
+        Flour=2,
+        Water=1,
+        LemonGrass=10,
+        Comfrey=5,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=5,
+        Result:PillsAntiPoisoning,
+	    Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_PillsCommercialSedative
+    {
+        mesh = WorldItems/PainKillers,
+        texture = WorldItems/QP_PillsCommercialSedative,
+        scale = 0.4,
+    }
+    
+    item PillsCommercialSedative
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    0.1,
+        UseWhileEquipped    =    FALSE,
+        DisplayName    =    PillsCommercialSedative,
+        Icon    =    PillsCommercialSedative,
+        Tooltip = Tooltip_PillsCommercialSedative,
+        StaticModel = PillBottle,
+        WorldStaticModel = QP_PillsCommercialSedative,
+        Medical = TRUE,
+    }
+    
+    recipe Make PillsCommercialSedative
+    
+    {
+        keep MortarPestle,
+        Flour=2,
+        Water=1,
+        PillsBeta=10,
+        Comfrey=10,
+        Plantain=10,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=4,
+        Result:PillsCommercialSedative,
+	    Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    item PillsPharmacyPrescription
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    0.1,
+        UseWhileEquipped    =    FALSE,
+        DisplayName    =    PillsPharmacyPrescription,
+        Icon    =    PillsPharmacyPrescription,
+        Tooltip = Tooltip_PillsPharmacyPrescription,
+        StaticModel = PillBottle,
+        WorldStaticModel = PainKillers_Ground,
+        Medical = TRUE,
+    }
+    
+    model QP_Syrette
+    {
+        mesh = WorldItems/QP_Syrette,
+        texture = WorldItems/QP_Syrette,
+        scale = 0.001,
+    }
+    
+    item SyretteHighGradePainkillers
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.05,
+        HungerChange    =   0,
+        Type    =    Food,
+        DisplayName    =    SyretteHighGradePainkillers,
+        CustomEatSound = ,
+        StressChange    =   10,
+        EatType = qpsyrette,
+        CustomContextMenu = Inject,
+        OnEat = OnEat_SyretteHighGradePainkillers,
+        Icon    =    SyretteHighGradePainkillers,
+        Tooltip = Tooltip_SyretteHighGradePainkillers,
+        WorldStaticModel = QP_Syrette,
+        Medical = TRUE,
+    }
+    
+    recipe Make SyretteHighGradePainkillers
+    {
+        keep MortarPestle,
+        Pen/RedPen/BluePen,
+        Water=1,
+        PillsPharmacyPrescription=20,
+        PillsPrescriptionPainkillers=5,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor20,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=7,
+        Result:SyretteHighGradePainkillers,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:350.0,
+    }
+    
+    item SyretteAdrenalin
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.05,
+        HungerChange    =   0,
+        Type    =    Food,
+        DisplayName    =    SyretteAdrenalin,
+        CustomEatSound = ,
+        StressChange    =   10,
+        EatType = qpsyrette,
+        CustomContextMenu = Inject,
+        OnEat = OnEat_SyretteAdrenalin,
+        Icon    =    SyretteAdrenalin,
+        Tooltip = Tooltip_SyretteAdrenalin,
+        WorldStaticModel = QP_Syrette,
+        Medical = TRUE,
+    }
+    
+    recipe Make SyretteAdrenalin
+    {
+        keep MortarPestle,
+        Pen/RedPen/BluePen,
+        Water=1,
+        PillsPharmacyPrescription=20,
+        PillsCaffeine=5,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor20,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=7,
+        Result:SyretteAdrenalin,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:350.0,
+    }
+    
+    item SyrettePrescriptionAntibiotic
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.05,
+        HungerChange    =   0,
+        Type    =    Food,
+        DisplayName    =    SyrettePrescriptionAntibiotic,
+        CustomEatSound = ,
+        StressChange    =   10,
+        EatType = qpsyrette,
+        CustomContextMenu = Inject,
+        OnEat = OnEat_SyrettePrescriptionAntibiotic,
+        Icon    =    SyrettePrescriptionAntibiotic,
+        Tooltip = Tooltip_SyrettePrescriptionAntibiotic,
+        WorldStaticModel = QP_Syrette,
+        Medical = TRUE,
+    }
+    
+    recipe Make SyrettePrescriptionAntibiotic
+    {
+        keep MortarPestle,
+        Pen/RedPen/BluePen,
+        Water=1,
+        PillsPharmacyPrescription=20,
+        PillsCommercialAntibiotic=1,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor20,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=7,
+        Result:SyrettePrescriptionAntibiotic,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:350.0,
+    }
+    
+    item SyrettePrescriptionSedatives 
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.05,
+        HungerChange    =   0,
+        Type    =    Food,
+        DisplayName    =    SyrettePrescriptionSedatives,
+        CustomEatSound = ,
+        StressChange    =   10,
+        EatType = qpsyrette,
+        CustomContextMenu = Inject,
+        OnEat = OnEat_SyrettePrescriptionSedatives,
+        Icon    =    SyrettePrescriptionSedatives,
+        Tooltip = Tooltip_SyrettePrescriptionSedatives,
+        WorldStaticModel = QP_Syrette,
+        Medical = TRUE,
+    }
+
+    recipe Make SyrettePrescriptionSedatives
+    {
+        keep MortarPestle,
+        Pen/RedPen/BluePen,
+        Water=1,
+        PillsPharmacyPrescription=20,
+        PillsCommercialSedative=1,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor20,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=6,
+        Result:SyrettePrescriptionSedatives,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:350.0,
+    }
+    
+    model QP_BottleFluMedication
+    {
+        mesh = WorldItems/Bottle,
+        texture = WorldItems/QP_BottleFluMedication,
+        scale = 0.3,
+    }
+    
+    item BottleFluMedication
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    1.0,
+        HungerChange    =   0,
+        Type    =    Food,
+        DisplayName    =    BottleFluMedication,
+        CustomEatSound = ,
+        EatType = popcan,
+        CustomContextMenu = Drink,
+        OnEat = OnEat_BottleFluMedication,
+        Icon    =    BottleFluMedication,
+        Tooltip = Tooltip_BottleFluMedication,
+        WorldStaticModel = QP_BottleFluMedication,
+        Medical = TRUE,
+    }
+
+    recipe Make BottleFluMedication
+    {
+        keep MortarPestle,
+        destroy WaterBottleEmpty/PopBottleEmpty/WhiskeyEmpty,
+        Water=5,
+        BlackSage=5,
+        CommonMallow=5,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=4,
+        Result:BottleFluMedication,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_PowderPackFluMedication
+    {
+        mesh = WorldItems/ColdPack,
+        texture = WorldItems/QP_PowderPackFluMedication,
+        scale = 0.15,
+    }
+    
+    item PowderPackFluMedication
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.1,
+        Type    =    Normal,
+        DisplayName    =    PowderPackFluMedication,
+        Icon    =    PowderPackFluMedication,
+        Tooltip = Tooltip_PowderPackFluMedication,
+        WorldStaticModel = QP_PowderPackFluMedication,
+        Medical = TRUE,
+    }
+
+    recipe Make PowderPackFluMedication
+    {
+        keep MortarPestle,
+        Plasticbag=1,
+        Violets=5,
+        CommonMallow=5,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=5,
+        Result:PowderPackFluMedication,
+        Sound:Hammering,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    recipe Make HotDrinkFluMedication
+    {
+        Water=1,
+        destroy WaterMug,
+        PowderPackFluMedication,
+        Result:HotDrinkFluMedicationMug,
+        Time:200.0,
+    }
+    
+    item HotDrinkFluMedicationMug
+    {
+        DisplayName = HotDrinkFluMedication,
+        DisplayCategory = FirstAid,
+        Type = Food,
+        Weight = 0.5,
+        Icon = MugFull,
+        GoodHot = true,
+        IsCookable = true,
+        ReplaceOnUse = Base.Mugl,
+        MinutesToCook = 5,
+        MinutesToBurn = 15,
+        ThirstChange = -20,
+        UnhappyChange = -10,
+        CustomContextMenu = Drink,
+        OnEat = OnEat_HotDrinkFluMedication,
+        CustomEatSound = DrinkingFromCan,
+        StaticModel = Mug,
+        WorldStaticModel = Mug,
+    }
+    
+    recipe Make HotDrinkFluMedication
+    {
+        Water=1,
+        destroy WaterMugRed,
+        PowderPackFluMedication,
+        Result:HotDrinkFluMedicationMugRed,
+        Time:200.0,
+    }
+    
+    item HotDrinkFluMedicationMugRed
+    {
+        DisplayName = HotDrinkFluMedication,
+        DisplayCategory = FirstAid,
+        Type = Food,
+        Weight = 0.5,
+        Icon = MugRedFull,
+        GoodHot = true,
+        IsCookable = true,
+        ReplaceOnUse = Base.MugRed,
+        MinutesToCook = 5,
+        MinutesToBurn = 15,
+        ThirstChange = -20,
+        UnhappyChange = -10,
+        CustomContextMenu = Drink,
+        OnEat = OnEat_HotDrinkFluMedication,
+        CustomEatSound = DrinkingFromCan,
+        StaticModel = MugRed,
+        WorldStaticModel = MugRed,
+    }
+    
+    recipe Make HotDrinkFluMedication
+    {
+        Water=1,
+        destroy WaterMugWhite,
+        PowderPackFluMedication,
+        Result:HotDrinkFluMedicationMugWhite,
+        Time:200.0,
+    }
+    
+    item HotDrinkFluMedicationMugWhite
+    {
+        DisplayName = HotDrinkFluMedication,
+        DisplayCategory = FirstAid,
+        Type = Food,
+        Weight = 0.5,
+        Icon = MugWhiteFull,
+        GoodHot = true,
+        IsCookable = true,
+        ReplaceOnUse = Base.MugWhite,
+        MinutesToCook = 5,
+        MinutesToBurn = 15,
+        ThirstChange = -20,
+        UnhappyChange = -10,
+        CustomContextMenu = Drink,
+        OnEat = OnEat_HotDrinkFluMedication,
+        CustomEatSound = DrinkingFromCan,
+        StaticModel = MugWhite,
+        WorldStaticModel = MugWhite,
+    }
+    
+    recipe Make HotDrinkFluMedication
+    {
+        Water=1,
+        destroy WaterMugSpiffo,
+        PowderPackFluMedication,
+        Result:HotDrinkFluMedicationMugSpiffo,
+        Time:200.0,
+    }
+    
+    item HotDrinkFluMedicationMugSpiffo
+    {
+        DisplayName = HotDrinkFluMedication,
+        DisplayCategory = FirstAid,
+        Type = Food,
+        Weight = 0.5,
+        Icon = MugSpiffoFull,
+        GoodHot = true,
+        IsCookable = true,
+        ReplaceOnUse = Base.MugSpiffo,
+        MinutesToCook = 5,
+        MinutesToBurn = 15,
+        ThirstChange = -20,
+        UnhappyChange = -10,
+        CustomContextMenu = Drink,
+        OnEat = OnEat_HotDrinkFluMedication,
+        CustomEatSound = DrinkingFromCan,
+        StaticModel = MugSpiffo,
+        WorldStaticModel = MugSpiffo,
+    }
+    
+    model QP_SealedBandage
+    {
+        mesh = WorldItems/QP_SealedBandage,
+        texture = WorldItems/QP_SealedBandage,
+        scale = 0.002,
+    }
+    
+    item SealedBandage
+    {
+        DisplayCategory = FirstAid,
+        Weight  =   0.11,
+        DisplayName =   SealedBandage,
+        Icon    =   SealedBandage,
+        Tooltip = Tooltip_SealedBandage,
+        SurvivalGear = TRUE,
+        WorldStaticModel = QP_SealedBandage,
+    }
+    
+    recipe Open SealedBandage
+    {
+        SealedBandage,
+        Result:AlcoholBandage,
+        Sound:OpenSeedPacket,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_BurnTreatment
+    {
+        mesh = WorldItems/HairGel,
+        texture = WorldItems/QP_BurnTreatment,
+        scale = 0.4,
+    }
+    
+    item BurnTreatment 
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.2,
+        Type    =    Drainable,
+        UseDelta    =    0.1,
+        DisplayName    =    BurnTreatment,
+        Icon    =    BurnTreatment,
+        Tooltip = Tooltip_BurnTreatment,
+        WorldStaticModel = QP_BurnTreatment,
+    }
+
+    recipe Make BurnTreatment
+    {
+        keep MortarPestle,
+        [Recipe.GetItemTypes.Flour]=2,
+        Water=2,
+        BlackSage=5,
+        Plantain=5,
+        WildGarlic2;5,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor15,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=6,
+        Result:BurnTreatment,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_PowderPackHemostatic
+    {
+        mesh = WorldItems/ColdPack,
+        texture = WorldItems/QP_PowderPackHemostatic,
+        scale = 0.15,
+    }
+    
+    item PowderPackHemostatic
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.1,
+        Type    =    Normal,
+        DisplayName    =    PowderPackHemostatic,
+        Icon    =    PowderPackHemostatic,
+        Tooltip = Tooltip_PowderPackHemostatic,
+        WorldStaticModel = QP_PowderPackHemostatic,
+        Medical = TRUE,
+    }
+
+    recipe Make PowderPackHemostatic
+    {
+        keep MortarPestle,
+        Plasticbag=1,
+        BlackSage=5,
+        WildGarlic2;5,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor15,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=6,
+        Result:PowderPackHemostatic,
+        Sound:Hammering,
+        Category:Health,
+        Time:200.0,
+    }
+    
+    model QP_Tourniquet
+    {
+        mesh = WorldItems/String,
+        texture = WorldItems/QP_Tourniquet,
+        scale = 0.7,
+    }
+    
+    item Tourniquet
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.1,
+        Type    =    Normal,
+        DisplayName    =    Tourniquet,
+        Icon    =    Tourniquet,
+        WorldStaticModel = QP_Tourniquet,
+        Tooltip = Tooltip_Tourniquet,
+        Medical = TRUE,
+    }
+
+    recipe Make Tourniquet
+    {
+        RubberBand=5,
+
+        Result:Tourniquet,
+        Sound:ClothesRipping,
+        Category:Health,
+        Time:40.0,
+    }
+    
+    model QP_BottleCoughSyrup
+    {
+        mesh = WorldItems/Bottle,
+        texture = WorldItems/QP_BottleCoughSyrup,
+        scale = 0.2,
+    }
+    
+    item BottleCoughSyrup
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.1,
+        HungerChange    =   0,
+        Type    =    Food,
+        DisplayName    =    BottleCoughSyrup,
+        CustomEatSound = ,
+        EatType = popcan,
+        CustomContextMenu = Drink,
+        OnEat = OnEat_BottleCoughSyrup,
+        Icon    =    BottleCoughSyrup,
+        Tooltip = Tooltip_BottleCoughSyrup,
+        WorldStaticModel = QP_BottleCoughSyrup,
+        Medical = TRUE,
+    }
+
+    recipe Make BottleCoughSyrup
+    {
+        destroy WaterBottleEmpty/PopBottleEmpty/WhiskeyEmpty,
+        Water=3,
+        Sugar;5,
+        Pills=10,
+
+        Result:BottleCoughSyrup,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+
+    model QP_NasalSpray
+    {
+        mesh = WorldItems/QP_NasalSpray,
+        texture = WorldItems/QP_NasalSpray,
+        scale = 0.001,
+    }
+    
+    item NasalSpray
+    {
+        DisplayCategory = FirstAid,
+        Weight    =    0.1,
+        HungerChange    =   0,
+        Type    =    Food,
+        DisplayName    =    NasalSpray,
+        CustomEatSound = ,
+        EatType = popcan,
+        CustomContextMenu = Drink,
+        OnEat = OnEat_NasalSpray,
+        Icon    =    NasalSpray,
+        Tooltip = Tooltip_NasalSpray,
+        WorldStaticModel = QP_NasalSpray,
+        Medical = TRUE,
+    }
+
+    recipe Make NasalSpray
+    {
+        keep MortarPestle,
+        destroy WaterBottleEmpty/PopBottleEmpty/WhiskeyEmpty,
+        Water=1,
+        BlackSage=3,
+        CommonMallow=3,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor10,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=2,
+        Result:NasalSpray,
+        Sound:MakePlaster,
+        Category:Health,
+        Time:200.0,
+    }
+
+    item EmergencySurgeryKit
+    {
+        DisplayCategory = FirstAid,
+        Weight	=	3,
+        Type    =    Normal,
+        DisplayName	=	Emergency Surgery Kit,
+        Icon	=	FirstAid,
+        Medical = TRUE,
+        Tooltip = Tooltip_EmergencySurgeryKit,
+		ReplaceInSecondHand = Bag_FirstAidKit_LHand holdingbagleft,
+        ReplaceInPrimaryHand = Bag_FirstAidKit_RHand holdingbagright,
+        WorldStaticModel = LunchBoxMedic_Ground,
+    }
+
+    recipe Make EmergencySurgeryKit
+    {
+        Scalpel,
+        Scissors,
+        SutureNeedle,
+        SutureNeedleHolder,
+        Stapler,
+        Staples,
+        AlcoholBandage=3,
+        Disinfectant=10,
+        CottonBalls=5,
+        AlcoholWipes=10,
+
+        OnGiveXP:Recipe.OnGiveXP.Qpocalypse15.Doctor25,
+        NeedToBeLearn:true,
+        SkillRequired:Doctor=4,
+        NoBrokenItems:true,
+        StopOnWalk:true,
+        StopOnRun:true,
+        Time:500.0,
+        Result:EmergencySurgeryKit,
+        Category:Health,
+    }
+
+    item LightweightEmergencySurgeryKit
+    {
+        DisplayCategory = FirstAid,
+        Weight	=	0,
+        Type    =    Normal,
+        DisplayName	=	Lightweight Emergency Surgery Kit,
+        Icon	=	FirstAid,
+        Medical = TRUE,
+        Tooltip = Tooltip_EmergencySurgeryKit,
+		ReplaceInSecondHand = Bag_FirstAidKit_LHand holdingbagleft,
+        ReplaceInPrimaryHand = Bag_FirstAidKit_RHand holdingbagright,
+        WorldStaticModel = LunchBoxMedic_Ground,
+    }
+}

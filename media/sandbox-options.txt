@@ -1,0 +1,79 @@
+VERSION = 1,
+
+option Qpocalypse15.IncapacitatedHealth
+{
+	type = integer, min = 5, max = 80, default = 25,
+	page = Qpocalypse15, translation = Qpocalypse15_IncapacitatedHealth,
+}
+
+option Qpocalypse15.IncapacitatedTime
+{
+	type = integer, min = 0, max = 240, default = 6,
+	page = Qpocalypse15, translation = Qpocalypse15_IncapacitatedTime,
+}
+
+option Qpocalypse15.AssistedRecoveryTicks
+{
+	type = integer, min = 100, max = 3000, default = 1200,
+	page = Qpocalypse15, translation = Qpocalypse15_AssistedRecoveryTicks,
+}
+
+option Qpocalypse15.UnassistedRecovery
+{
+	type = boolean, default = true,
+	page = Qpocalypse15, translation = Qpocalypse15_UnassistedRecovery,
+}
+
+option Qpocalypse15.RecoveryRequiresPassive
+{
+	type = boolean, default = true,
+	page = Qpocalypse15, translation = Qpocalypse15_RecoveryRequiresPassive,
+}
+
+option Qpocalypse15.RecoveryHealth
+{
+	type = integer, min = 5, max = 100, default = 50,
+	page = Qpocalypse15, translation = Qpocalypse15_RecoveryHealth,
+}
+
+option Qpocalypse15.RecoveryRemovesInjuries
+{
+	type = boolean, default = false,
+	page = Qpocalypse15, translation = Qpocalypse15_RecoveryRemovesInjuries,
+}
+
+option Qpocalypse15.PassiveSkillLoss
+{
+	type = integer, min = 0, max = 100, default = 50,
+	page = Qpocalypse15, translation = Qpocalypse15_PassiveSkillLoss,
+}
+
+option Qpocalypse15.AgilitySkillLoss
+{
+	type = integer, min = 0, max = 100, default = 25,
+	page = Qpocalypse15, translation = Qpocalypse15_AgilitySkillLoss,
+}
+
+option Qpocalypse15.WeaponSkillLoss
+{
+	type = integer, min = 0, max = 100, default = 10,
+	page = Qpocalypse15, translation = Qpocalypse15_WeaponSkillLoss,
+}
+
+option Qpocalypse15.OtherSkillLoss
+{
+	type = integer, min = 0, max = 100, default = 0,
+	page = Qpocalypse15, translation = Qpocalypse15_OtherSkillLoss,
+}
+
+option Qpocalypse15.FirstAidRequired
+{
+	type = integer, min = 0, max = 10, default = 0,
+	page = Qpocalypse15, translation = Qpocalypse15_FirstAidRequired,
+}
+
+option Qpocalypse15.DragDownAllowed
+{
+	type = boolean, default = false,
+	page = Qpocalypse15, translation = Qpocalypse15_DragDownAllowed,
+}

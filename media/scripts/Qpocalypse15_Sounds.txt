@@ -1,0 +1,72 @@
+module Qpocalypse15
+{
+    sound Bardmusic1
+    {
+        category = Effect,
+        loop = false,
+        is3D = true,
+        clip {
+            file = media/sound/bardmusic1.ogg,
+            volume = 1.0,
+            pitch = 1.0,
+            distanceMin = 0,
+            distanceMax = 20
+        }
+    }
+
+    sound Bardmusic2
+    {
+        category = Effect,
+        loop = false,
+        is3D = true,
+        clip {
+            file = media/sound/bardmusic2.ogg,
+            volume = 1.0,
+            pitch = 1.0,
+            distanceMin = 0,
+            distanceMax = 20
+        }
+    }
+
+    sound Bardmusic3
+    {
+        category = Effect,
+        loop = false,
+        is3D = true,
+        clip {
+            file = media/sound/bardmusic3.ogg,
+            volume = 1.0,
+            pitch = 1.0,
+            distanceMin = 0,
+            distanceMax = 20
+        }
+    }
+
+    sound Bardmusic4
+    {
+        category = Effect,
+        loop = false,
+        is3D = true,
+        clip {
+            file = media/sound/bardmusic4.ogg,
+            volume = 1.0,
+            pitch = 1.0,
+            distanceMin = 0,
+            distanceMax = 20
+        }
+    }
+
+    sound Bardmusic5
+    {
+        category = Effect,
+        loop = false,
+        is3D = true,
+        clip {
+            file = media/sound/bardmusic5.ogg,
+            volume = 1.0,
+            pitch = 1.0,
+            distanceMin = 0,
+            distanceMax = 20
+        }
+    }
+} 
