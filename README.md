@@ -1,2 +1,3 @@
-# QboidAPITester
-QLinkAll에서 보내는 RCON 명령 테스트를 위한 모드입니다.
+# Qpocalypse1.5
+Qpocalypse1.5를 위한 모드입니다.
+직업 추가, 부활 매커니즘 추가, 의약품 시스템 추가, 팀 버프 아이템 추가 등이 이루어졌습니다.
