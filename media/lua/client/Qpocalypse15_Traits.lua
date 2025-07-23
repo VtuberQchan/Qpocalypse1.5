@@ -38,7 +38,7 @@ function SpecialisationFunction(_player, _perk, _amount)
 	local newamount = 0
 	local skip = false
 	local skipxpadd = false
-	local modifier = 10
+	local modifier = 90
 	local perklvl = player:getPerkLevel(_perk)
 	local perkxpmod = 1;
 	--shift decimal over two places for calculation purposes.
@@ -125,7 +125,7 @@ function SpecialisationFunction(_player, _perk, _amount)
 					if xpforlevel >= curxp then
 						break ;
 					else
-						AddXP(player, perk, -1 * 0.1)
+						player:getXp():AddXP(perk, -1 * 0.1)
 					end
 				end
 			end
