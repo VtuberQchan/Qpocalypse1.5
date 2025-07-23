@@ -2,7 +2,6 @@
 --Traits Setup for Qpocalypse 1.5
 
 require("NPCs/MainCreationMethods")
-require("Qpocalypse15_Traits")
 
 Qpocalypse15 = Qpocalypse15 or {}
 
@@ -103,6 +102,16 @@ ProfessionFramework.addTrait('FieldMedicSpecialisation', {
 ProfessionFramework.addTrait('RunnerSpecialisation', {
     name = "UI_trait_runnerspecialisation",
     description = "UI_trait_runnerspecialisationdesc",
+    profession = true,
+    OnGameStart = function(trait)
+        Events.AddXP.Add(SpecialisationFunction)
+        Events.LevelPerk.Add(FixSpecialisationFunction)
+    end
+})
+
+ProfessionFramework.addTrait('UnemployedSpecialisation', {
+    name = "UI_trait_unemployedspecialisation",
+    description = "UI_trait_unemployedspecialisationdesc",
     profession = true,
     OnGameStart = function(trait)
         Events.AddXP.Add(SpecialisationFunction)

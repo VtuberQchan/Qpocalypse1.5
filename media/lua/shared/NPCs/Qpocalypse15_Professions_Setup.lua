@@ -1,8 +1,6 @@
 --Qpocalypse15_Professions.lua
 --Professions for Qpocalypse 1.5
 
-require("Qpocalypse15_Traits_Setup")
-
 Qpocalypse15 = Qpocalypse15 or {}
 
 --Debug Log Function
@@ -12,6 +10,13 @@ end
 
 --Remove all vanilla professions
 ProfessionFramework.RemoveDefaultProfessions = true
+
+-- unemployed
+ProfessionFramework.addProfession('unemployed', {
+    name = "UI_prof_unemployed",    -- 번역 키 그대로 사용
+    icon = "prof_wanderer",         -- 아무 아이콘이나 가능
+    cost = -200,                       -- 원본 게임과 동일(0 point)
+})
 
 ---------Combatant Professions---------
 --Vanguard
@@ -174,7 +179,7 @@ ProfessionFramework.addProfession("Forager", {
 })
 
 --Field Medic
-ProfessionFramework.addProfession("Field Medic", {
+ProfessionFramework.addProfession("FieldMedic", {
     icon = "profession_Qpocalypse15_field_medic",
     name = "UI_prof_Qpocalypse15_field_medic",
     cost = 6,

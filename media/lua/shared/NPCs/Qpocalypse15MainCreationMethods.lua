@@ -1,0 +1,1 @@
+require('NPCs/MainCreationMethods')

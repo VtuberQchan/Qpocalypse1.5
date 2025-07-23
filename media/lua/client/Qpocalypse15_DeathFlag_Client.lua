@@ -1,20 +1,29 @@
 -- Qpocalypse15 DeathFlag - Client Module
 
--- ***************************************************************************
--- * DeathFlag Extended Functionality                                        *
--- ***************************************************************************
+Qpocalypse15_DeathFlagClient = Qpocalypse15_DeathFlagClient or {}
 
--- Internal state tables/flags
-Qpocalypse15_DeathFlagClient.noisePlayer = nil
-Qpocalypse15_DeathFlagClient.noiseEndTime = 0
-Qpocalypse15_DeathFlagClient.isNoiseEventAdded = false
+-- Internal state tables/flags - Safe initialization
+Qpocalypse15_DeathFlagClient.noisePlayer = Qpocalypse15_DeathFlagClient.noisePlayer or nil
+Qpocalypse15_DeathFlagClient.noiseEndTime = Qpocalypse15_DeathFlagClient.noiseEndTime or 0
+Qpocalypse15_DeathFlagClient.isNoiseEventAdded = Qpocalypse15_DeathFlagClient.isNoiseEventAdded or false
 
-Qpocalypse15_DeathFlagClient.protectedPlayers = {} -- [onlineID] = { player = IsoPlayer, endTime = number }
-Qpocalypse15_DeathFlagClient.isZombieEventAdded = false
+-- Ensure protectedPlayers is always a table
+if not Qpocalypse15_DeathFlagClient.protectedPlayers or type(Qpocalypse15_DeathFlagClient.protectedPlayers) ~= 'table' then
+    Qpocalypse15_DeathFlagClient.protectedPlayers = {}
+end
+Qpocalypse15_DeathFlagClient.isZombieEventAdded = Qpocalypse15_DeathFlagClient.isZombieEventAdded or false
+-- Flag to ensure ProtectionTimer is only added once
+Qpocalypse15_DeathFlagClient.isProtectionTimerAdded = Qpocalypse15_DeathFlagClient.isProtectionTimerAdded or false
 
--- Utility : current real-time in milliseconds (Project Zomboid helper)
-local function getNowMs()
-    return getTimestampMs and getTimestampMs() or (os.time() * 1000)
+-- Constants
+local PROTECTION_LOOPS = 40  -- Number of EveryOneMinute ticks before protection expires
+
+local function isTableEmpty(tbl)
+    if type(tbl) ~= 'table' then return true end
+    for _ in pairs(tbl) do
+        return false
+    end
+    return true
 end
 
 -- World noise every in-game minute for 30 real-time seconds
@@ -37,7 +46,7 @@ end
 
 function Qpocalypse15_DeathFlagClient.StartNoise(player)
     Qpocalypse15_DeathFlagClient.noisePlayer = player
-    Qpocalypse15_DeathFlagClient.noiseEndTime = getNowMs() + 30000 -- 30 real-time seconds
+    Qpocalypse15_DeathFlagClient.noiseEndTime = getNowMs() + 5000 -- 5 real-time seconds
 
     if not Qpocalypse15_DeathFlagClient.isNoiseEventAdded then
         Events.EveryOneMinute.Add(Qpocalypse15_DeathFlagClient.NoiseEvent)
@@ -49,13 +58,18 @@ end
 function Qpocalypse15_DeathFlagClient.AddProtectedPlayer(tgtPlayer)
     if not tgtPlayer then return end
 
+    -- Safe initialization
+    if not Qpocalypse15_DeathFlagClient.protectedPlayers or type(Qpocalypse15_DeathFlagClient.protectedPlayers) ~= 'table' then
+        Qpocalypse15_DeathFlagClient.protectedPlayers = {}
+    end
+
     -- Save current alpha and apply semi-transparency
     local originalAlpha = tgtPlayer:getAlpha()
     tgtPlayer:setAlpha(0.5) -- semi-transparent
 
     Qpocalypse15_DeathFlagClient.protectedPlayers[tgtPlayer:getOnlineID()] = {
         player        = tgtPlayer,
-        endTime       = getNowMs() + 30000, -- 30 seconds protection
+        loopsLeft     = PROTECTION_LOOPS, -- expire after 40 in-game minutes
         originalAlpha = originalAlpha
     }
 
@@ -64,14 +78,71 @@ function Qpocalypse15_DeathFlagClient.AddProtectedPlayer(tgtPlayer)
         Events.OnZombieUpdate.Add(Qpocalypse15_DeathFlagClient.OnZombieUpdate)
         Qpocalypse15_DeathFlagClient.isZombieEventAdded = true
     end
+
+    -- Ensure protection timer (EveryOneMinute) is present
+    if not Qpocalypse15_DeathFlagClient.isProtectionTimerAdded then
+        Events.EveryOneMinute.Add(Qpocalypse15_DeathFlagClient.ProtectionTimer)
+        Qpocalypse15_DeathFlagClient.isProtectionTimerAdded = true
+    end
 end
 
-function Qpocalypse15_DeathFlagClient.OnZombieUpdate(zombie)
-    local now = getNowMs()
+-- Decrement protection loops every in-game minute
+function Qpocalypse15_DeathFlagClient.ProtectionTimer()
+    if not Qpocalypse15_DeathFlagClient.protectedPlayers or type(Qpocalypse15_DeathFlagClient.protectedPlayers) ~= 'table' then
+        Qpocalypse15_DeathFlagClient.protectedPlayers = {}
+    end
+
     local removeList = {}
 
     for id, data in pairs(Qpocalypse15_DeathFlagClient.protectedPlayers) do
-        if now > data.endTime then
+        if type(data) ~= 'table' or not data.loopsLeft then
+            table.insert(removeList, id)
+        else
+            data.loopsLeft = data.loopsLeft - 1
+            if data.loopsLeft <= 0 then
+                table.insert(removeList, id)
+            end
+        end
+    end
+
+    -- Cleanup expired protections
+    for _, id in ipairs(removeList) do
+        local data = Qpocalypse15_DeathFlagClient.protectedPlayers[id]
+        if data and data.player then
+            data.player:setAlpha(data.originalAlpha or 1.0)
+        end
+        Qpocalypse15_DeathFlagClient.protectedPlayers[id] = nil
+    end
+
+    -- Remove timer if table empty
+    if isTableEmpty(Qpocalypse15_DeathFlagClient.protectedPlayers) and Qpocalypse15_DeathFlagClient.isProtectionTimerAdded then
+        Events.EveryOneMinute.Remove(Qpocalypse15_DeathFlagClient.ProtectionTimer)
+        Qpocalypse15_DeathFlagClient.isProtectionTimerAdded = false
+    end
+end
+
+function Qpocalypse15_DeathFlagClient.OnZombieUpdate(zombie)
+    -- Safe initialization
+    if not Qpocalypse15_DeathFlagClient.protectedPlayers or type(Qpocalypse15_DeathFlagClient.protectedPlayers) ~= 'table' then
+        Qpocalypse15_DeathFlagClient.protectedPlayers = {}
+        return
+    end
+
+    -- If table is empty, nothing to process
+    if isTableEmpty(Qpocalypse15_DeathFlagClient.protectedPlayers) then
+        return
+    end
+
+    local removeList = {}
+
+    -- Double-check before using pairs() to prevent "Expected a table" error
+    if type(Qpocalypse15_DeathFlagClient.protectedPlayers) ~= 'table' then
+        Qpocalypse15_DeathFlagClient.protectedPlayers = {}
+        return
+    end
+
+    for id, data in pairs(Qpocalypse15_DeathFlagClient.protectedPlayers) do
+        if type(data) ~= 'table' or not data.loopsLeft or data.loopsLeft <= 0 then
             table.insert(removeList, id)
         else
             local p = data.player
@@ -91,15 +162,16 @@ function Qpocalypse15_DeathFlagClient.OnZombieUpdate(zombie)
         Qpocalypse15_DeathFlagClient.protectedPlayers[id] = nil
     end
 
-    -- Remove event if table empty
-    local isEmpty = true
-    for _ in pairs(Qpocalypse15_DeathFlagClient.protectedPlayers) do
-        isEmpty = false
-        break
-    end
+    -- Remove events if table empty
+    local isEmpty = (type(Qpocalypse15_DeathFlagClient.protectedPlayers) ~= 'table') or isTableEmpty(Qpocalypse15_DeathFlagClient.protectedPlayers)
     if isEmpty and Qpocalypse15_DeathFlagClient.isZombieEventAdded then
         Events.OnZombieUpdate.Remove(Qpocalypse15_DeathFlagClient.OnZombieUpdate)
         Qpocalypse15_DeathFlagClient.isZombieEventAdded = false
+    end
+
+    if isEmpty and Qpocalypse15_DeathFlagClient.isProtectionTimerAdded then
+        Events.EveryOneMinute.Remove(Qpocalypse15_DeathFlagClient.ProtectionTimer)
+        Qpocalypse15_DeathFlagClient.isProtectionTimerAdded = false
     end
 end
 
@@ -118,6 +190,23 @@ function Qpocalypse15_DeathFlagClient.RegisterNearbyPlayers(sourcePlayer)
     end
 end
 
+-- Utility : gather onlineIDs (source + 20tiles) -> broadcast to server
+function Qpocalypse15_DeathFlagClient.GetNearbyPlayerIDs(sourcePlayer)
+    local ids = { sourcePlayer:getOnlineID() }
+    local sx, sy = sourcePlayer:getX(), sourcePlayer:getY()
+    for i = 0, getNumActivePlayers() - 1 do
+        local other = getSpecificPlayer(i)
+        if other and other ~= sourcePlayer then
+            local dx = sx - other:getX()
+            local dy = sy - other:getY()
+            if (dx * dx + dy * dy) <= 400 then
+                table.insert(ids, other:getOnlineID())
+            end
+        end
+    end
+    return ids
+end
+
 -- Add DeathFlag context menu
 local function onFillInventoryObjectContextMenu(player, context, items)
     if not player or not items then return end
@@ -131,7 +220,6 @@ local function onFillInventoryObjectContextMenu(player, context, items)
 end
 
 function Qpocalypse15_DeathFlagClient.DeleteDeathFlagItem(player, item)
-    local player = getPlayer()
     player:getInventory():Remove(item)
 end
 
@@ -154,8 +242,30 @@ function Qpocalypse15_DeathFlagClient.RaiseDeathFlag()
 
         -- Protect nearby players from zombie aggro for 30 real-time seconds
         Qpocalypse15_DeathFlagClient.RegisterNearbyPlayers(player)
+
+        -- Send protected list to server (synchronise all client+server)
+        local ids = Qpocalypse15_DeathFlagClient.GetNearbyPlayerIDs(player)
+        sendClientCommand('DeathFlag', 'AddProtected', { ids = ids })
         
     end
 end
 
 Events.OnFillInventoryObjectContextMenu.Add(onFillInventoryObjectContextMenu)
+
+-- Receive protected information from the server for client-side synchronisation
+local function onServerCommand(module, command, args)
+    if module == 'DeathFlag' and command == 'ProtectedAdd' and args and args.ids then
+        if type(args.ids) == 'table' then
+            for _, id in ipairs(args.ids) do
+                for i = 0, getNumActivePlayers() - 1 do
+                    local p = getSpecificPlayer(i)
+                    if p and p:getOnlineID() == id then
+                        Qpocalypse15_DeathFlagClient.AddProtectedPlayer(p)
+                        break
+                    end
+                end
+            end
+        end
+    end
+end
+Events.OnServerCommand.Add(onServerCommand)

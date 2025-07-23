@@ -1,9 +1,6 @@
 --Qpocalypse15_Traits.lua
 --Traits for Qpocalypse 1.5
 
-require "2ProfessionFramework"
-require "3ProfessionTraits"
-
 Qpocalypse15 = Qpocalypse15 or {}
 
 --Debug Log Function
@@ -88,6 +85,9 @@ function SpecialisationFunction(_player, _perk, _amount)
                     skip = true
                 end
             end
+			if player:HasTrait("UnemployedSpecialisation") then
+				skip = false
+			end
 			newamount = amount * modifier
 			local currentxp = player:getXp():getXP(perk)
 			local correctamount = currentxp - newamount
@@ -133,6 +133,8 @@ function SpecialisationFunction(_player, _perk, _amount)
 	else
 		skipxpadd = false;
 	end
+	-- Ensure XP is not negative after adjustments
+	FixSpecialisationFunction(player, perk)
 end
 
 function FixSpecialisationFunction(player, perk)
@@ -210,7 +212,7 @@ function ReconCombatSpecialisation(_actor, _target, _weapon, _damage)
 	end
 end
 
-function GunslingerCombatSpecialisation(_actor, _weapon)
+function GunslingerCombatSpecialisation(_actor, _target, _weapon, _damage)
 	local player = getPlayer()
 	local weapon = _weapon
 	local weapondata = weapon:getModData()
@@ -234,11 +236,15 @@ function GunslingerCombatSpecialisation(_actor, _weapon)
 			end
 		end
 		weapondata.iLastWeaponCond = weapon:getCondition()
-		if SandboxVars.MoreTraits.ProwessGunsAmmoRestore == true and ZombRand(0, 101) <= chance then
+		if ZombRand(0, 101) <= chance then
 			if currentCapacity < maxCapacity and currentCapacity > 0 then
 				weapon:setCurrentAmmoCount(currentCapacity + 1)
-				if MoreTraits.settings.ProwessGunsAmmo == true then
-					HaloTextHelper.addText(player, getText("IGUI_progunammo"), HaloTextHelper.getColorGreen());
+				-- Player says a random ammo restore line
+				local randomIndex = ZombRand(5) + 1
+				local textKey = "IGUI_Traits_GunslingerCombatSpecialisationAmmo" .. tostring(randomIndex)
+				local line = getText(textKey)
+				if line and line ~= "" then
+					player:Say(line)
 				end
 			end
 		end
