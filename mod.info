@@ -3,5 +3,5 @@ author=QCHAN
 poster=poster.png
 id=qpocalypse15
 versionMin=41.73
-require=ProfessionFramework,ExpandedHelicopterEvents,batman_HTC_EHE_MilitaryDrop,firearmmodRevamp,noirrsling_edited,TheWorkshop(new version),ScrapWeapons(new version),ScrapArmor(new version),DrivingSkill,ScavengingSkillFixed
+require=ProfessionFramework,TheWorkshop(new version),ScrapWeapons(new version),ScrapArmor(new version),DrivingSkill,ScavengingSkillFixed,ParasiteZed
 description=Qpocalypse 1.5 - Expert System, Revival System, Medical System

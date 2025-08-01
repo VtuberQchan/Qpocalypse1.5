@@ -69,4 +69,54 @@ module Qpocalypse15
             distanceMax = 20
         }
     }
+
+    sound QP15_Shouting
+    {
+        category = Effect,
+        loop = false,
+        is3D = true,
+        clip {
+            file = media/sound/qp15_shouting.ogg,
+            volume = 1.0,
+            pitch = 1.0,
+            distanceMin = 0,
+            distanceMax = 40
+        }
+    }
+
+    sound QP15_Woosh
+    {
+        category = Effect,
+        loop = false,
+        is3D = false,
+        clip {
+            file = media/sound/qp15_woosh.ogg,
+            volume = 1.0,
+            pitch = 1.0
+        }
+    }
+
+    sound QP15_OhMyGod
+    {
+        category = Effect,
+        loop = false,
+        is3D = false,
+        clip {
+            file = media/sound/qp15_ohmygod.ogg,
+            volume = 1.0,
+            pitch = 1.0
+        }
+    }
+
+    sound QP15_TAB
+    {
+        category = Effect,
+        loop = false,
+        is3D = false,
+        clip {
+            file = media/sound/qp15_TAB.ogg,
+            volume = 0.7,
+            pitch = 1.0
+        }
+    }
 } 

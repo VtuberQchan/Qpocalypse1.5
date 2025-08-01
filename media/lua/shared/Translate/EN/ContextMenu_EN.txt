@@ -8,4 +8,6 @@ ContextMenu_EN = {
 	ContextMenu_Qpocalypse15_ActionUnavailable = "Emergency Surgery Unavailable",
 	ContextMenu_Qpocalypse15_PlayBard = "Become a Bard of the Battlefield",
 	ContextMenu_Qpocalypse15_DeathFlag = "Raise Death Flag",
+	ContextMenu_Qpocalypse15_StartTAB = "Start They Are Billions Event",
+	ContextMenu_Qpocalypse15_Looting = "Loot %s",
 }

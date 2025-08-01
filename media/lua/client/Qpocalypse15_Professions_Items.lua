@@ -20,6 +20,7 @@ function Qpocalypse15.initProfessionsItems(_player)
 	end
 
 	if player:HasTrait("ReconSpecialisation") then
+		inv:addItemOnServer(inv:AddItem("Base.MeatCleaver"))
 		inv:addItemOnServer(inv:AddItem("Base.HuntingKnife"))
 	end
 
@@ -44,12 +45,14 @@ function Qpocalypse15.initProfessionsItems(_player)
     end
 
     if player:HasTrait("FieldMedicSpecialisation") then
+		inv:addItemOnServer(inv:AddItem("Base.HuntingKnife"))
         inv:addItemOnServer(inv:AddItem("Base.MortarPestle"))
         inv:addItemOnServer(inv:AddItem("Qpocalypse15.EmergencySurgeryKit"))
         inv:addItemOnServer(inv:AddItem("Qpocalypse15.EmergencySurgeryKit"))
     end
 
     if player:HasTrait("RunnerSpecialisation") then
+        inv:addItemOnServer(inv:AddItem("Base.LeadPipe"))
         inv:addItemOnServer(inv:AddItem("Qpocalypse15.BagRunnerSatchel"))
     end
 end

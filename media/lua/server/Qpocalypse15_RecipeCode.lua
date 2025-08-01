@@ -1,6 +1,6 @@
-Recipe = {}
-Recipe.OnGiveXP = {}
-Recipe.OnGiveXP.Qpocalypse15 = {}
+Recipe = Recipe or {}
+Recipe.OnGiveXP = Recipe.OnGiveXP or {}
+Recipe.OnGiveXP.Qpocalypse15 = Recipe.OnGiveXP.Qpocalypse15 or {}
 
 function Recipe.OnGiveXP.Qpocalypse15.Doctor10(recipe, ingredients, result, player)
     player:getXp():AddXP(Perks.Doctor, 10);

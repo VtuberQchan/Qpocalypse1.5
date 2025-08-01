@@ -7,11 +7,18 @@ if not Qpocalypse15_DeathFlagServer.protectedPlayers or type(Qpocalypse15_DeathF
     Qpocalypse15_DeathFlagServer.protectedPlayers = {}
 end
 
+-- Define helper to safely (re)initialise the protectedPlayers table
+local function ensureProtectedPlayersTable()
+    if not Qpocalypse15_DeathFlagServer.protectedPlayers or type(Qpocalypse15_DeathFlagServer.protectedPlayers) ~= 'table' then
+        Qpocalypse15_DeathFlagServer.protectedPlayers = {}
+    end
+end
+
 -- Run initialisation
 ensureProtectedPlayersTable()
 
 -- Constants
-local PROTECTION_LOOPS = 40 -- Number of EveryOneMinute ticks before protection expires
+local PROTECTION_LOOPS = 25 -- Number of EveryOneMinute ticks before protection expires
 
 -- Clean up expired protections (called periodically)
 local function cleanupExpiredProtections()
@@ -47,19 +54,34 @@ end
 
 -- Handling when a client sends a protect request
 local function onClientCommand(module, command, playerObj, args)
-    if module ~= 'DeathFlag' or command ~= 'AddProtected' then return end
-    if not args or type(args.ids) ~= 'table' then return end
+    if module ~= 'DeathFlag' then return end
 
-    ensureProtectedPlayersTable()
-    
-    for _, id in ipairs(args.ids) do
-        -- Reset or set protection to the full loop count
-        Qpocalypse15_DeathFlagServer.protectedPlayers[id] = PROTECTION_LOOPS
-    end
+    if command == 'AddProtected' then
+        if not args or type(args.ids) ~= 'table' then return end
 
-    -- Synchronise protection targets to all clients (safe server command to all clients)
-    if sendServerCommand then
-        sendServerCommand('DeathFlag', 'ProtectedAdd', { ids = args.ids })
+        ensureProtectedPlayersTable()
+
+        for _, id in ipairs(args.ids) do
+            -- Reset or set protection to the full loop count
+            Qpocalypse15_DeathFlagServer.protectedPlayers[id] = PROTECTION_LOOPS
+        end
+
+        -- Synchronise protection targets to all clients (safe server command to all clients)
+        if sendServerCommand then
+            sendServerCommand('DeathFlag', 'ProtectedAdd', { ids = args.ids })
+        end
+
+    elseif command == 'StartShoutSound' then
+        if not args then return end
+        -- Forward shout sound to all clients
+        if sendServerCommand then
+            sendServerCommand('DeathFlag', 'StartShoutSound', {
+                playerID = playerObj:getOnlineID(),
+                x = args.x,
+                y = args.y,
+                z = args.z
+            })
+        end
     end
 end
 Events.OnClientCommand.Add(onClientCommand)

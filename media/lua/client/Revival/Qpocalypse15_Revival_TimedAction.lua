@@ -24,7 +24,14 @@ function Qpocalypse15.TimedAction:stop() ISBaseTimedAction.stop(self) end
 function Qpocalypse15.TimedAction:perform()
   ISBaseTimedAction.perform(self)
 
-  print("@@@@@@@@ " .. tostring(getGameTime():getWorldAgeHours() - start))
+  print("@@@@@@@ " .. tostring(getGameTime():getWorldAgeHours() - start))
+
+  -- Consume the kit that was used
+  local inv = self.character:getInventory()
+  if inv then
+    local kit = inv:getFirstTypeRecurse("Qpocalypse15.LightweightEmergencySurgeryKit") or inv:getFirstTypeRecurse("Qpocalypse15.EmergencySurgeryKit")
+    if kit then inv:Remove(kit) end
+  end
 
   if isClient() then Qpocalypse15.Sync.sendClient(self.character, Qpocalypse15.Sync.REVIVE, Qpocalypse15.Sync.getArgsFromTarget(self.target)) end
 end

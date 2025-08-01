@@ -2,6 +2,7 @@ Qpocalypse15.Sync = {}
 
 Qpocalypse15.Sync.INCAPACITATE = "incapacitate"
 Qpocalypse15.Sync.REVIVE = "revive"
+Qpocalypse15.Sync.LOOT = "loot"
 
 local ANIMATION_VARIABLE = "Qpocalypse15_Incapacitated"
 

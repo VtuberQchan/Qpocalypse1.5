@@ -220,6 +220,7 @@ ProfessionFramework.addProfession("FieldMedic", {
         "Make Tourniquet",
         "Make NasalSpray",
         "Make EmergencySurgeryKit",
+        "Make Antizom",
     },
 })
 

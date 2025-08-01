@@ -77,4 +77,25 @@ module Qpocalypse15
         WorldStaticModel = EmptyNotebook,
         Tooltip = Tooltip_DeathFlag,
     }
+	
+	item RabbitBread
+	{
+		DisplayName = Rabbit Bread,
+		DisplayCategory = Food,
+		Type = Food,
+		Weight = 0.0,
+		Icon = RabbitBread,
+		EvolvedRecipe = Soup:8;Stew:8;Salad:8,
+		FoodType = Bread,
+		IsCookable = true,
+		MinutesToCook = 4,
+		Packaged = TRUE,
+		HungerChange = -8,
+		Calories = 300,
+		Carbohydrates = 66,
+		Lipids = 4.44,
+		Proteins = 11.8,
+		WorldStaticModel = Bread,
+        Tooltip = Tooltip_RabbitBread,
+	}
 }

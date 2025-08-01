@@ -46,9 +46,12 @@ local onFillWorldObjectContextMenu = function(playerNum, context)
 
   local hasFirstAidSkill = SandboxVars.Qpocalypse15.FirstAidRequired == 0 or SandboxVars.Qpocalypse15.FirstAidRequired <= player:getPerkLevel(Perks.Doctor)
   local hasSurgeryKit = player:getInventory():getCountType("Qpocalypse15.EmergencySurgeryKit") > 0
-  local hasLightWeightSurgeryKit = player:getInventory():getCountType("Qpocalypse15.LightWeightEmergencySurgeryKit") > 0
+  local hasLightweightSurgeryKit = player:getInventory():getCountType("Qpocalypse15.LightweightEmergencySurgeryKit") > 0
 
-  if hasFirstAidSkill and (hasSurgeryKit or hasLightWeightSurgeryKit) then
+  -- Lightweight kit ignores First Aid requirement
+  local canRevive = hasLightweightSurgeryKit or (hasSurgeryKit and hasFirstAidSkill)
+
+  if canRevive then
     context:addOptionOnTop(string.format(getText("ContextMenu_Qpocalypse15_Action"), clickedPlayer:getDisplayName()), player, onReviveAction, clickedPlayer)
   else
     local option = context:addOptionOnTop(string.format(getText("ContextMenu_Qpocalypse15_ActionUnavailable"), clickedPlayer:getDisplayName(), SandboxVars.Qpocalypse15.FirstAidRequired))

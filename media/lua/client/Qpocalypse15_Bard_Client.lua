@@ -340,20 +340,12 @@ function Qpocalypse15_BardClient.updateBardPlayerPositions()
                             print("Qpocalypse15 Bard: Player " .. playerID .. " back in range, requesting resync")
                         end
                     elseif bardData.emitter and (math.abs(bardData.x - newX) > 0.1 or math.abs(bardData.y - newY) > 0.1 or bardData.z ~= newZ) then
-                        -- Replace with new emitter if position changed
-                        bardData.emitter:stopAll()
-                        
-                        local newEmitter = getWorld():getFreeEmitter(newX, newY, newZ)
-                        if newEmitter then
-                            local newSoundID = newEmitter:playSound(bardData.musicFile)
-                            if newSoundID then
-                                bardData.emitter = newEmitter
-                                bardData.soundID = newSoundID
-                                bardData.x = newX
-                                bardData.y = newY
-                                bardData.z = newZ
-                            end
-                        end
+                        -- Keep existing emitter and update position only
+                        bardData.emitter:setPos(newX, newY, newZ)
+                        bardData.emitter:tick()
+                        bardData.x = newX
+                        bardData.y = newY
+                        bardData.z = newZ
                     end
                 end
             end
